@@ -28,6 +28,6 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public void gotoMyBatch() {
-        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).addToBackStack(null).commit();
     }
 }

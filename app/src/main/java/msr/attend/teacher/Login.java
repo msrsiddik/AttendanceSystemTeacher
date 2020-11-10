@@ -14,8 +14,10 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import msr.attend.teacher.Model.TeacherLoginModel;
+import msr.attend.teacher.Model.UserPref;
 
 public class Login extends Fragment {
+    private UserPref userPref;
     private EditText phone, pass;
     private Button loginBtn;
     private FragmentInterface fragmentInterface;
@@ -36,6 +38,7 @@ public class Login extends Fragment {
         phone = view.findViewById(R.id.loginPhone);
         pass = view.findViewById(R.id.loginPass);
         loginBtn = view.findViewById(R.id.signInBtn);
+        userPref = new UserPref(getContext());
 
         fragmentInterface = (FragmentInterface) getActivity();
 
@@ -45,7 +48,8 @@ public class Login extends Fragment {
                 new FirebaseDatabaseHelper().login(new TeacherLoginModel(phone.getText().toString(), pass.getText().toString()),
                         new FireMan.TeacherLogin() {
                     @Override
-                    public void loginIsSuccess() {
+                    public void loginIsSuccess(String id) {
+                        userPref.setTeacherId(id);
                         fragmentInterface.gotoDashBoard();
                     }
 

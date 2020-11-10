@@ -18,7 +18,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import msr.attend.teacher.Model.UserPref;
+
 public class MyBatch extends Fragment {
+    private UserPref userPref;
     private ListView studentListView;
     public MyBatch() {
         // Required empty public constructor
@@ -34,8 +37,9 @@ public class MyBatch extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         studentListView = view.findViewById(R.id.myBatchStudentList);
+        userPref = new UserPref(getContext());
 
-        new FirebaseDatabaseHelper().getMyBatchStudent(list -> {
+        new FirebaseDatabaseHelper().getMyBatchStudent(userPref.getMyBatch(), list -> {
             studentListView.setAdapter(new MyStudentAdapter(getContext(), list));
         });
     }

@@ -11,7 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 
+import msr.attend.teacher.Model.UserPref;
+
 public class DashBoard extends Fragment {
+    private UserPref userPref;
     private ImageButton myBatch;
     private FragmentInterface fragmentInterface;
 
@@ -29,6 +32,11 @@ public class DashBoard extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         myBatch = view.findViewById(R.id.myBatch);
+        userPref = new UserPref(getContext());
+
+        new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
+            userPref.setMyBatch(model.getBatch());
+        });
 
         fragmentInterface = (FragmentInterface) getActivity();
         myBatch.setOnClickListener(v -> {
