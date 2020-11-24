@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.UserPref;
 
 public class MyBatch extends Fragment {
@@ -44,10 +45,10 @@ public class MyBatch extends Fragment {
         });
     }
 
-    class MyStudentAdapter extends ArrayAdapter<String> {
+    class MyStudentAdapter extends ArrayAdapter<StudentModel> {
         Context context;
-        List<String> list = null;
-        public MyStudentAdapter(@NonNull Context context, @NonNull List<String> objects) {
+        List<StudentModel> list = null;
+        public MyStudentAdapter(@NonNull Context context, @NonNull List<StudentModel> objects) {
             super(context, R.layout.my_batch_student_row, objects);
             this.context = context;
             this.list = objects;
@@ -60,7 +61,7 @@ public class MyBatch extends Fragment {
             View view = inflater.inflate(R.layout.my_batch_student_row, parent,false);
 
             TextView name = view.findViewById(R.id.studentName);
-            name.setText(list.get(position));
+            name.setText(list.get(position).getName());
             return view;
         }
     }

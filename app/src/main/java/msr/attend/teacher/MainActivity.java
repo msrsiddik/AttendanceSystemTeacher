@@ -5,6 +5,9 @@ import androidx.fragment.app.FragmentManager;
 
 import android.os.Bundle;
 
+import msr.attend.teacher.Model.ClassModel;
+import msr.attend.teacher.Model.Utils;
+
 public class MainActivity extends AppCompatActivity implements FragmentInterface{
     private FragmentManager fragmentManager;
     @Override
@@ -29,5 +32,20 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     @Override
     public void gotoMyBatch() {
         fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoMyClassAttend() {
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyClass()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoAttendanceRegister(ClassModel classModel) {
+        Bundle bundle = new Bundle();
+        String model = Utils.getGsonParser().toJson(classModel);
+        bundle.putString("classModel", model);
+        Attendance_Register attendance_register = new Attendance_Register();
+        attendance_register.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, attendance_register).addToBackStack(null).commit();
     }
 }

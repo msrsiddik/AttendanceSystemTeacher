@@ -10,10 +10,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
+import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.CoordinatorModel;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.TeacherLoginModel;
@@ -24,13 +23,39 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference teacherLogin;
     private DatabaseReference myBatchStudent;
     private DatabaseReference coordinatorRef;
+    private DatabaseReference classInfoRef;
 
     public FirebaseDatabaseHelper() {
         database = FirebaseDatabase.getInstance();
         teacherLogin = database.getReference().child("Teachers");
         myBatchStudent = database.getReference().child("Students");
         coordinatorRef = database.getReference().child("Coordinators");
+        classInfoRef = database.getReference().child("ClassInformation");
 
+    }
+
+    public void getClassInfo(String teacherId, FireMan.ClassInfoListener listener){
+        List<ClassModel> list = new ArrayList<>();
+        classInfoRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    if (ds.exists()){
+                        ClassModel classModel = ds.getValue(ClassModel.class);
+                        if (classModel.getTeacherId().equals(teacherId)) {
+                            list.add(classModel);
+                        }
+                    }
+                }
+                listener.classInfoIsLoaded(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void getCourseCoordinator(String id,FireMan.CoordinatorListener listener){
@@ -54,9 +79,9 @@ public class FirebaseDatabaseHelper {
         myBatchStudent.orderByChild("batch").equalTo(batch).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> list = new ArrayList<>();
+                List<StudentModel> list = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()){
-                    list.add(ds.getValue(StudentModel.class).getName());
+                    list.add(ds.getValue(StudentModel.class));
                 }
                 load.studentIsLoaded(list);
             }
