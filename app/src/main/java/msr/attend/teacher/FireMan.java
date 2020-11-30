@@ -18,4 +18,11 @@ public class FireMan {
 
         void classInfoIsLoaded(List<ClassModel> list);
     }
+
+    public interface StudentDataShort{
+        void studentIsLoaded(List<StudentModel> students);
+        void studentIsInserted();
+        void studentIsDeleted();
+        void studentIsEdited();
+    }
 }

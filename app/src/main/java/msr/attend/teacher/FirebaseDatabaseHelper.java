@@ -24,6 +24,7 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference myBatchStudent;
     private DatabaseReference coordinatorRef;
     private DatabaseReference classInfoRef;
+    private DatabaseReference studentRef;
 
     public FirebaseDatabaseHelper() {
         database = FirebaseDatabase.getInstance();
@@ -31,7 +32,47 @@ public class FirebaseDatabaseHelper {
         myBatchStudent = database.getReference().child("Students");
         coordinatorRef = database.getReference().child("Coordinators");
         classInfoRef = database.getReference().child("ClassInformation");
+        studentRef = database.getReference().child("Students");
 
+    }
+
+    public void editStudent(StudentModel model, final FireMan.StudentDataShort dataShort){
+        studentRef.child(model.getId()).setValue(model)
+                .addOnSuccessListener(aVoid -> {
+                    dataShort.studentIsEdited();
+                });
+    }
+
+    public void deleteStudent(String id, final FireMan.StudentDataShort dataShort){
+        studentRef.child(id).setValue(null)
+                .addOnSuccessListener(aVoid -> dataShort.studentIsDeleted());
+    }
+
+    public void getStudents(FireMan.StudentDataShort dataShort){
+        List<StudentModel> list = new ArrayList<>();
+        studentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                list.clear();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    StudentModel model = ds.getValue(StudentModel.class);
+                    list.add(model);
+                }
+                dataShort.studentIsLoaded(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void insertStudent(StudentModel student, final FireMan.StudentDataShort dataShort){
+        String id = studentRef.push().getKey();
+        student.setId(id);
+        studentRef.child(student.getId()).setValue(student)
+                .addOnSuccessListener(aVoid -> dataShort.studentIsInserted());
     }
 
     public void getClassInfo(String teacherId, FireMan.ClassInfoListener listener){

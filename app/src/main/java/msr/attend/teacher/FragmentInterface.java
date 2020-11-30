@@ -8,4 +8,5 @@ public interface FragmentInterface {
     void gotoMyBatch();
     void gotoMyClassAttend();
     void gotoAttendanceRegister(ClassModel classModel);
+    void addStudentForm();
 }

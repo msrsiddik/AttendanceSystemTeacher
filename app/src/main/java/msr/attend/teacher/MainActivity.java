@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public void gotoMyBatch() {
-        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).addToBackStack(null).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).addToBackStack("myBatch").commit();
     }
 
     @Override
@@ -47,5 +47,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
         Attendance_Register attendance_register = new Attendance_Register();
         attendance_register.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.fragContainer, attendance_register).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void addStudentForm() {
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new AddStudent()).addToBackStack(null).commit();
     }
 }
