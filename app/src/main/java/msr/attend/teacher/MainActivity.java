@@ -53,4 +53,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     public void addStudentForm() {
         fragmentManager.beginTransaction().replace(R.id.fragContainer, new AddStudent()).addToBackStack(null).commit();
     }
+
+    @Override
+    public void gotoMyNotificationSender() {
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSender()).addToBackStack(null).commit();
+    }
 }

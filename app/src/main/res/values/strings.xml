@@ -11,4 +11,102 @@
         <item>CSE</item>
     </string-array>
 
+    <string-array name="first_bsc_cse">
+        <item>CSE-101</item>
+        <item>PHY-101</item>
+        <item>GED-101</item>
+        <item>GED-102</item>
+    </string-array>
+
+    <string-array name="second_bsc_cse">
+        <item>CSE-103</item>
+        <item>CSE-104</item>
+        <item>PHY-103</item>
+        <item>PHY-104</item>
+        <item>ENG-101</item>
+        <item>MATH-101</item>
+    </string-array>
+
+    <string-array name="third_bsc_cse">
+        <item>CSE-105</item>
+        <item>CSE-106</item>
+        <item>CHEM-101</item>
+        <item>CHEM-102</item>
+        <item>ENG-102</item>
+        <item>MATH-102</item>
+    </string-array>
+
+    <string-array name="fourth_bsc_cse">
+        <item>CSE-201</item>
+        <item>EEE-201</item>
+        <item>EEE-202</item>
+        <item>GED-201</item>
+        <item>MATH-201</item>
+    </string-array>
+
+    <string-array name="fifth_bsc_cse">
+        <item>CSE-203</item>
+        <item>CSE-204</item>
+        <item>CSE-205</item>
+        <item>CSE-206</item>
+        <item>MATH-201</item>
+    </string-array>
+
+    <string-array name="sixth_bsc_cse">
+        <item>CSE-207</item>
+        <item>CSE-204</item>
+        <item>CSE-209</item>
+        <item>GED-202</item>
+        <item>MATH-203</item>
+    </string-array>
+
+    <string-array name="seventh_bsc_cse">
+        <item>CSE-301</item>
+        <item>CSE-302</item>
+        <item>CSE-303</item>
+        <item>CSE-304</item>
+        <item>EEE-301</item>
+        <item>GED-301</item>
+    </string-array>
+
+    <string-array name="eighth_bsc_cse">
+        <item>CSE-305</item>
+        <item>CSE-306</item>
+        <item>CSE-307</item>
+        <item>CSE-308</item>
+        <item>CSE-313</item>
+    </string-array>
+
+    <string-array name="ninth_bsc_cse">
+        <item>CSE-309</item>
+        <item>CSE-310</item>
+        <item>CSE-311</item>
+        <item>CSE-312</item>
+        <item>CSE-315</item>
+        <item>CSE-317</item>
+    </string-array>
+
+    <string-array name="tenth_bsc_cse">
+        <item>CSE-401</item>
+        <item>CSE-402</item>
+        <item>CSE-403</item>
+        <item>CSE-404</item>
+        <item>CSE-409</item>
+        <item>CSE-410</item>
+    </string-array>
+
+    <string-array name="eleventh_bsc_cse">
+        <item>CSE-405</item>
+        <item>CSE-406</item>
+        <item>CSE-407</item>
+        <item>CSE-408</item>
+        <item>CSE-411</item>
+    </string-array>
+
+    <string-array name="twelfth_bsc_cse">
+        <item>CSE-419</item>
+        <item>CSE-420</item>
+        <item>CSE-425</item>
+    </string-array>
+
 </resources>

@@ -94,6 +94,7 @@
             android:layout_margin="5dp"
             android:layout_weight="1">
             <ImageButton
+                android:id="@+id/notificationSet"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/notification"

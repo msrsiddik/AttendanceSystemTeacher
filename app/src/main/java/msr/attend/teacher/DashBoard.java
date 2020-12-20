@@ -25,7 +25,7 @@ import msr.attend.teacher.Model.UserPref;
 
 public class DashBoard extends Fragment {
     private UserPref userPref;
-    private ImageButton myStudent, myBatch, attendance;
+    private ImageButton myStudent, myBatch, attendance, notificationSet;
     private FragmentInterface fragmentInterface;
 
     public DashBoard() {
@@ -44,6 +44,7 @@ public class DashBoard extends Fragment {
         myStudent = view.findViewById(R.id.myStudent);
         myBatch = view.findViewById(R.id.myBatch);
         attendance = view.findViewById(R.id.attendance);
+        notificationSet = view.findViewById(R.id.notificationSet);
         userPref = new UserPref(getContext());
 
         new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
@@ -56,6 +57,8 @@ public class DashBoard extends Fragment {
         myBatch.setOnClickListener(v -> fragmentInterface.gotoMyBatch());
 
         attendance.setOnClickListener(v -> fragmentInterface.gotoMyClassAttend());
+
+        notificationSet.setOnClickListener(v -> fragmentInterface.gotoMyNotificationSender());
     }
 
     private void getBatchAndGoToListStudent() {

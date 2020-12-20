@@ -9,4 +9,6 @@ public interface FragmentInterface {
     void gotoMyClassAttend();
     void gotoAttendanceRegister(ClassModel classModel);
     void addStudentForm();
+
+    void gotoMyNotificationSender();
 }

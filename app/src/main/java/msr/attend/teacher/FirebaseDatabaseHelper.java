@@ -1,5 +1,9 @@
 package msr.attend.teacher;
 
+import android.content.Context;
+import android.util.Log;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -10,8 +14,12 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.CoordinatorModel;
 import msr.attend.teacher.Model.StudentModel;
@@ -25,6 +33,7 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference coordinatorRef;
     private DatabaseReference classInfoRef;
     private DatabaseReference studentRef;
+    private DatabaseReference classAttendInfo;
 
     public FirebaseDatabaseHelper() {
         database = FirebaseDatabase.getInstance();
@@ -33,28 +42,98 @@ public class FirebaseDatabaseHelper {
         coordinatorRef = database.getReference().child("Coordinators");
         classInfoRef = database.getReference().child("ClassInformation");
         studentRef = database.getReference().child("Students");
+        classAttendInfo = database.getReference().child("ClassAttendInfo");
+    }
+
+    public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort){
+        List<String> dates = new ArrayList<>();
+
+//        Map<String, List<ClassAttendModel>> map = new HashMap<>();
+
+        classAttendInfo.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ClassAttendModel> list = new ArrayList<>();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    //date path
+                    for (DataSnapshot a : d.getChildren()){
+                        //subject code path
+                        for (DataSnapshot b : a.getChildren()){
+                            ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
+                            if (attendModel.getStuId().equals(stuId)){
+                                list.add(attendModel);
+                            }
+                        }
+//                        map.put(d.getKey(), list);
+                    }
+                }
+
+                dataShort.classAttendListener(list);
+
+//                for (Map.Entry<String, List<ClassAttendModel>> listMap : map.entrySet()){
+//                    for (ClassAttendModel c : listMap.getValue()){
+//                            Log.e("Student ",c.getStuId());
+//                    }
+//                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void getAttendDataByDate(String date, String classCode, final FireMan.ClassAttendListener listener) {
+        List<ClassAttendModel> list = new ArrayList<>();
+        classAttendInfo.child(date).child(classCode)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            if (ds.exists()) {
+                                ClassAttendModel attendModel = ds.getValue(ClassAttendModel.class);
+                                list.add(attendModel);
+                            }
+                        }
+                        listener.classIsLoaded(list);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
     }
 
-    public void editStudent(StudentModel model, final FireMan.StudentDataShort dataShort){
+    public void insertClassAttend(ClassAttendModel attendModel, String date, Context context) {
+
+        classAttendInfo.child(date).child(attendModel.getSubjectCode()).child(attendModel.getStuId())
+                .setValue(attendModel, (error, ref) -> {
+                    Toast.makeText(context, "Done", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    public void editStudent(StudentModel model, final FireMan.StudentDataShort dataShort) {
         studentRef.child(model.getId()).setValue(model)
                 .addOnSuccessListener(aVoid -> {
                     dataShort.studentIsEdited();
                 });
     }
 
-    public void deleteStudent(String id, final FireMan.StudentDataShort dataShort){
+    public void deleteStudent(String id, final FireMan.StudentDataShort dataShort) {
         studentRef.child(id).setValue(null)
                 .addOnSuccessListener(aVoid -> dataShort.studentIsDeleted());
     }
 
-    public void getStudents(FireMan.StudentDataShort dataShort){
+    public void getStudents(FireMan.StudentDataShort dataShort) {
         List<StudentModel> list = new ArrayList<>();
         studentRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     StudentModel model = ds.getValue(StudentModel.class);
                     list.add(model);
                 }
@@ -68,21 +147,21 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void insertStudent(StudentModel student, final FireMan.StudentDataShort dataShort){
+    public void insertStudent(StudentModel student, final FireMan.StudentDataShort dataShort) {
         String id = studentRef.push().getKey();
         student.setId(id);
         studentRef.child(student.getId()).setValue(student)
                 .addOnSuccessListener(aVoid -> dataShort.studentIsInserted());
     }
 
-    public void getClassInfo(String teacherId, FireMan.ClassInfoListener listener){
+    public void getClassInfo(String teacherId, FireMan.ClassInfoListener listener) {
         List<ClassModel> list = new ArrayList<>();
         classInfoRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 list.clear();
-                for (DataSnapshot ds : snapshot.getChildren()){
-                    if (ds.exists()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    if (ds.exists()) {
                         ClassModel classModel = ds.getValue(ClassModel.class);
                         if (classModel.getTeacherId().equals(teacherId)) {
                             list.add(classModel);
@@ -99,7 +178,7 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getCourseCoordinator(String id,FireMan.CoordinatorListener listener){
+    public void getCourseCoordinator(String id, FireMan.CoordinatorListener listener) {
         coordinatorRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -116,12 +195,12 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getMyBatchStudent(String batch, FireMan.MyBatchStudentLoad load){
+    public void getMyBatchStudent(String batch, FireMan.MyBatchStudentLoad load) {
         myBatchStudent.orderByChild("batch").equalTo(batch).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<StudentModel> list = new ArrayList<>();
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     list.add(ds.getValue(StudentModel.class));
                 }
                 load.studentIsLoaded(list);
@@ -134,14 +213,14 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void login(TeacherLoginModel model, final FireMan.TeacherLogin login){
+    public void login(TeacherLoginModel model, final FireMan.TeacherLogin login) {
         Query query = teacherLogin.orderByChild("phone").equalTo(model.getPhone());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     TeacherModel teacher = ds.getValue(TeacherModel.class);
-                    if (teacher.getPassword().equals(model.getPassword())){
+                    if (teacher.getPassword().equals(model.getPassword())) {
                         login.loginIsSuccess(teacher.getId());
                     } else {
                         login.loginIsFailed();

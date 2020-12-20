@@ -2,6 +2,7 @@ package msr.attend.teacher;
 
 import java.util.List;
 
+import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.CoordinatorModel;
 import msr.attend.teacher.Model.StudentModel;
@@ -15,7 +16,6 @@ public class FireMan {
     }
 
     public interface ClassInfoListener {
-
         void classInfoIsLoaded(List<ClassModel> list);
     }
 
@@ -25,4 +25,11 @@ public class FireMan {
         void studentIsDeleted();
         void studentIsEdited();
     }
+
+    public interface ClassAttendListener{ void classIsLoaded(List<ClassAttendModel> classAttendModels); }
+
+    public interface AttendDataShort{
+        void classAttendListener(List<ClassAttendModel> attendList);
+    }
+
 }
