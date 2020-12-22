@@ -10,5 +10,7 @@ public interface FragmentInterface {
     void gotoAttendanceRegister(ClassModel classModel);
     void addStudentForm();
 
-    void gotoMyNotificationSender();
+    void gotoMyNotification();
+    void gotoNoticeSet();
+    void gotoAttendViewByBatch(String batch);
 }

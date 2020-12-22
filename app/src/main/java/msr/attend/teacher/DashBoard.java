@@ -18,7 +18,9 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.UserPref;
@@ -58,7 +60,7 @@ public class DashBoard extends Fragment {
 
         attendance.setOnClickListener(v -> fragmentInterface.gotoMyClassAttend());
 
-        notificationSet.setOnClickListener(v -> fragmentInterface.gotoMyNotificationSender());
+        notificationSet.setOnClickListener(v -> fragmentInterface.gotoMyNotification());
     }
 
     private void getBatchAndGoToListStudent() {
@@ -68,17 +70,20 @@ public class DashBoard extends Fragment {
 
         Spinner spinner = dialog.findViewById(R.id.myBatch);
         new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), list -> {
-            List<String> batch = new ArrayList<>();
+            Set<String> batch = new HashSet<>();
             for (ClassModel model : list){
                 batch.add(model.getBatch());
             }
-            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch);
+            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
         });
 
         Button button = dialog.findViewById(R.id.myStudentBtn);
-        button.setOnClickListener(v -> Toast.makeText(getContext(), ""+spinner.getSelectedItem(), Toast.LENGTH_SHORT).show());
+        button.setOnClickListener(v -> {
+            dialog.dismiss();
+            fragmentInterface.gotoAttendViewByBatch(spinner.getSelectedItem().toString());
+        });
 
         dialog.show();
     }

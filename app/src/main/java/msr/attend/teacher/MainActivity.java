@@ -55,7 +55,21 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     }
 
     @Override
-    public void gotoMyNotificationSender() {
+    public void gotoMyNotification() {
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NoticeBoard()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoNoticeSet() {
         fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSender()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoAttendViewByBatch(String batch) {
+        Bundle bundle = new Bundle();
+        bundle.putString("batch", batch);
+        AttendanceViewByBatch viewByBatch = new AttendanceViewByBatch();
+        viewByBatch.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, viewByBatch).addToBackStack(null).commit();
     }
 }

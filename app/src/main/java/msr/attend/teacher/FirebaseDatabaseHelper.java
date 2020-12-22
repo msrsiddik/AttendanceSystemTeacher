@@ -22,6 +22,7 @@ import java.util.Map;
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.CoordinatorModel;
+import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.TeacherLoginModel;
 import msr.attend.teacher.Model.TeacherModel;
@@ -34,6 +35,7 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference classInfoRef;
     private DatabaseReference studentRef;
     private DatabaseReference classAttendInfo;
+    private DatabaseReference notification;
 
     public FirebaseDatabaseHelper() {
         database = FirebaseDatabase.getInstance();
@@ -43,6 +45,33 @@ public class FirebaseDatabaseHelper {
         classInfoRef = database.getReference().child("ClassInformation");
         studentRef = database.getReference().child("Students");
         classAttendInfo = database.getReference().child("ClassAttendInfo");
+        notification = database.getReference().child("Notification");
+    }
+
+    public void getNotice(String teacherId, final FireMan.NoticeDataShort dataShort){
+        List<NoticeModel> noticeModels = new ArrayList<>();
+        notification.child(teacherId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                noticeModels.clear();
+                for (DataSnapshot d : snapshot.getChildren()){
+                    NoticeModel model = d.getValue(NoticeModel.class);
+                    noticeModels.add(model);
+                }
+                dataShort.noticeLoadListener(noticeModels);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void setNotice(NoticeModel notice){
+        String key = notification.push().getKey().substring(9,20);
+        notice.setNoticeId(key);
+        notification.child(notice.getTeacherId()).child(key).setValue(notice);
     }
 
     public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort){

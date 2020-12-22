@@ -5,6 +5,7 @@ import java.util.List;
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.CoordinatorModel;
+import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.StudentModel;
 
 public class FireMan {
@@ -30,6 +31,10 @@ public class FireMan {
 
     public interface AttendDataShort{
         void classAttendListener(List<ClassAttendModel> attendList);
+    }
+
+    public interface NoticeDataShort{
+        void noticeLoadListener(List<NoticeModel> noticeModels);
     }
 
 }

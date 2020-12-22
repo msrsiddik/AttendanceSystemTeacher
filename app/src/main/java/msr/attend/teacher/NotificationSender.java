@@ -1,35 +1,39 @@
 package msr.attend.teacher;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.firebase.messaging.FirebaseMessaging;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import msr.attend.teacher.Model.ClassModel;
+import msr.attend.teacher.Model.NoticeModel;
+import msr.attend.teacher.Model.UserPref;
 
 public class NotificationSender extends Fragment {
-    private RequestQueue mRequestQue;
-    private String URL = "https://fcm.googleapis.com/fcm/send";
+    private UserPref userPref;
+    private Button datePicker, sendBtn;
+    private Spinner batchSpinner;
+    private TextView tNoticeTitle, tNoticeBody;
+    private EditText eNoticeTitle, eNoticeBody;
+    private final Calendar myCalendar = Calendar.getInstance();
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public NotificationSender() {
         // Required empty public constructor
@@ -44,58 +48,54 @@ public class NotificationSender extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        mRequestQue = Volley.newRequestQueue(getContext());
-        sendNotification();
+        datePicker = view.findViewById(R.id.datePicker);
+        batchSpinner = view.findViewById(R.id.batchSpinner);
+        tNoticeTitle = view.findViewById(R.id.tNoticeTitle);
+        tNoticeBody = view.findViewById(R.id.tNoticeBody);
+        eNoticeTitle = view.findViewById(R.id.eNoticeTitle);
+        eNoticeBody = view.findViewById(R.id.eNoticeBody);
+        sendBtn = view.findViewById(R.id.sendBtn);
+
+        userPref = new UserPref(getContext());
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        updateLabel(1);
+        DatePickerDialog.OnDateSetListener date = (view1, year, monthOfYear, dayOfMonth) -> {
+            // TODO Auto-generated method stub
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, monthOfYear);
+            myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            updateLabel(0);
+        };
+        datePicker.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), date, myCalendar
+                    .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                    myCalendar.get(Calendar.DAY_OF_MONTH));
+            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+            datePickerDialog.show();
+        });
+
+        firebaseDatabaseHelper.getClassInfo(userPref.getTeacherId(), list -> {
+            Set<String> batch = new HashSet<>();
+            for (ClassModel model : list){
+                batch.add(model.getBatch());
+            }
+            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            batchSpinner.setAdapter(adapter);
+        });
+
+        sendBtn.setOnClickListener(v -> {
+            firebaseDatabaseHelper.setNotice(new NoticeModel(userPref.getTeacherId(), batchSpinner.getSelectedItem().toString(),
+                    eNoticeTitle.getText().toString(),eNoticeBody.getText().toString(),datePicker.getText().toString()));
+        });
     }
 
-    private void sendNotification() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("to","/topics/"+"news");
-            JSONObject notificationObj = new JSONObject();
-            notificationObj.put("title","any title");
-            notificationObj.put("body","any body");
-
-            JSONObject extraData = new JSONObject();
-            extraData.put("brandId","puma");
-            extraData.put("category","Shoes");
-
-
-
-            json.put("notification",notificationObj);
-            json.put("data",extraData);
-
-
-            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, URL,
-                    json,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-
-                            Log.d("MUR", "onResponse: ");
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("MUR", "onError: "+error.networkResponse);
-                }
-            }
-            ){
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String,String> header = new HashMap<>();
-                    header.put("content-type","application/json");
-                    header.put("authorization","key="+ FirebaseMessaging.getInstance().getToken());
-                    return header;
-                }
-            };
-            mRequestQue.add(request);
-        }
-        catch (JSONException e)
-
-        {
-            e.printStackTrace();
-        }
+    private void updateLabel(int d) {
+        String myFormat = "dd/MM/yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        myCalendar.add(Calendar.DATE, d);
+        datePicker.setText(sdf.format(myCalendar.getTime()));
     }
 
 }
