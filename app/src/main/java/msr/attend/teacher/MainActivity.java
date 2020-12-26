@@ -3,10 +3,12 @@ package msr.attend.teacher;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.Utils;
+import msr.attend.teacher.Service.DIUService;
 
 public class MainActivity extends AppCompatActivity implements FragmentInterface{
     private FragmentManager fragmentManager;
@@ -15,6 +17,8 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
+
+        startService(new Intent(this, DIUService.class));
 
         login();
     }
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public void gotoNoticeSet() {
-        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSender()).addToBackStack(null).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSend()).addToBackStack(null).commit();
     }
 
     @Override

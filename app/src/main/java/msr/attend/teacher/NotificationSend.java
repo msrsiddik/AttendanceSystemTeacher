@@ -26,7 +26,7 @@ import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.UserPref;
 
-public class NotificationSender extends Fragment {
+public class NotificationSend extends Fragment {
     private UserPref userPref;
     private Button datePicker, sendBtn;
     private Spinner batchSpinner;
@@ -35,7 +35,7 @@ public class NotificationSender extends Fragment {
     private final Calendar myCalendar = Calendar.getInstance();
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
-    public NotificationSender() {
+    public NotificationSend() {
         // Required empty public constructor
     }
 
@@ -86,8 +86,12 @@ public class NotificationSender extends Fragment {
         });
 
         sendBtn.setOnClickListener(v -> {
-            firebaseDatabaseHelper.setNotice(new NoticeModel(userPref.getTeacherId(), batchSpinner.getSelectedItem().toString(),
-                    eNoticeTitle.getText().toString(),eNoticeBody.getText().toString(),datePicker.getText().toString()));
+            String title = eNoticeTitle.getText().toString();
+            String body = eNoticeBody.getText().toString();
+            String batch = batchSpinner.getSelectedItem().toString();
+            firebaseDatabaseHelper.setNotice(new NoticeModel(userPref.getTeacherId(), batch,
+                    title,body,datePicker.getText().toString()));
+            firebaseDatabaseHelper.sendNoticeByBatch(title,body,batch,getContext());
         });
     }
 

@@ -1,7 +1,6 @@
 package msr.attend.teacher;
 
 import android.content.Context;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,10 +13,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
@@ -26,6 +23,14 @@ import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.TeacherLoginModel;
 import msr.attend.teacher.Model.TeacherModel;
+import msr.attend.teacher.Notification.APIService;
+import msr.attend.teacher.Notification.Client;
+import msr.attend.teacher.Notification.Data;
+import msr.attend.teacher.Notification.MyResponse;
+import msr.attend.teacher.Notification.NotificationSender;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FirebaseDatabaseHelper {
     private FirebaseDatabase database;
@@ -37,6 +42,8 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference classAttendInfo;
     private DatabaseReference notification;
 
+    private APIService apiService;
+
     public FirebaseDatabaseHelper() {
         database = FirebaseDatabase.getInstance();
         teacherLogin = database.getReference().child("Teachers");
@@ -46,11 +53,50 @@ public class FirebaseDatabaseHelper {
         studentRef = database.getReference().child("Students");
         classAttendInfo = database.getReference().child("ClassAttendInfo");
         notification = database.getReference().child("Notification");
+
+        apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+    }
+
+    public void sendNoticeByBatch(String title, String body, String batch, Context context){
+        notification.child("Tokens").child(batch).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    String studentToken = ds.getValue(String.class);
+                    Data data = new Data(title, body);
+                    NotificationSender sender = new NotificationSender(data, studentToken);
+                    apiService.sendNotifcation(sender).enqueue(new Callback<MyResponse>() {
+                        @Override
+                        public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                            if (response.code() == 200) {
+                                if (response.body().success != 1) {
+                                    Toast.makeText(context, "Failed ", Toast.LENGTH_LONG);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void removeNotice(String teacherId, String noticeId){
+        notification.child("Notice").child(teacherId).child(noticeId).setValue(null);
     }
 
     public void getNotice(String teacherId, final FireMan.NoticeDataShort dataShort){
         List<NoticeModel> noticeModels = new ArrayList<>();
-        notification.child(teacherId).addValueEventListener(new ValueEventListener() {
+        notification.child("Notice").child(teacherId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 noticeModels.clear();
@@ -58,6 +104,7 @@ public class FirebaseDatabaseHelper {
                     NoticeModel model = d.getValue(NoticeModel.class);
                     noticeModels.add(model);
                 }
+                Collections.reverse(noticeModels);
                 dataShort.noticeLoadListener(noticeModels);
             }
 
@@ -69,9 +116,9 @@ public class FirebaseDatabaseHelper {
     }
 
     public void setNotice(NoticeModel notice){
-        String key = notification.push().getKey().substring(9,20);
+        String key = notification.push().getKey().substring(0,10);
         notice.setNoticeId(key);
-        notification.child(notice.getTeacherId()).child(key).setValue(notice);
+        notification.child("Notice").child(notice.getTeacherId()).child(key).setValue(notice);
     }
 
     public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort){
