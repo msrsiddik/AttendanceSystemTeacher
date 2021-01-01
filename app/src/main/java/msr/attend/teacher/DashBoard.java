@@ -48,6 +48,16 @@ public class DashBoard extends Fragment {
         attendance = view.findViewById(R.id.attendance);
         notificationSet = view.findViewById(R.id.notificationSet);
         userPref = new UserPref(getContext());
+        userPref.setIsLogin(true);
+
+        getActivity().setTitle("Dashboard");
+
+        int back = getFragmentManager().getBackStackEntryCount();
+        if (back > 0){
+            for (int i = 0; i < back; i++) {
+                getFragmentManager().popBackStack();
+            }
+        }
 
         new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
             userPref.setMyBatch(model.getBatch());

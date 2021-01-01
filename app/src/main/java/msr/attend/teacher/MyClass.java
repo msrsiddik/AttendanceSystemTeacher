@@ -43,6 +43,7 @@ public class MyClass extends Fragment {
         userPref = new UserPref(getContext());
 
         fragmentInterface = (FragmentInterface) getActivity();
+        getActivity().setTitle("My Class");
 
         new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
             @Override

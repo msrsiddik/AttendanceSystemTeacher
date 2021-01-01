@@ -52,6 +52,7 @@ public class MyBatch extends Fragment {
         addStudentBtn = view.findViewById(R.id.addStudentBtn);
 
         loadStudentFromDb();
+        getActivity().setTitle("My Batch");
 
         fragmentInterface = (FragmentInterface) getActivity();
         addStudentBtn.setOnClickListener(v -> fragmentInterface.addStudentForm());

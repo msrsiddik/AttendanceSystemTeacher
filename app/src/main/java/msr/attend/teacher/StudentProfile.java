@@ -22,6 +22,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ import msr.attend.teacher.Model.Utils;
 
 public class StudentProfile extends Fragment {
     private TextView studentName, studentBatch, studentDepart, studentNo, guardianNo;
+    private Button qrViewBtn, attendSaveBtn;
     private GridView classAttendGridView;
     private List<ClassAttendModel> attendList;
     Map<String, Integer> subCodeBySem;
@@ -63,7 +65,10 @@ public class StudentProfile extends Fragment {
         studentDepart = view.findViewById(R.id.studentDepart);
         studentNo = view.findViewById(R.id.studentNo);
         guardianNo = view.findViewById(R.id.guardianNo);
+        qrViewBtn = view.findViewById(R.id.qrViewBtn);
+        attendSaveBtn = view.findViewById(R.id.attendSaveBtn);
         classAttendGridView = view.findViewById(R.id.classAttendGridView);
+        getActivity().setTitle("Student Profile");
 
         Bundle bundle = getArguments();
         StudentModel model = Utils.getGsonParser().fromJson(bundle.getString("student"), StudentModel.class);
@@ -73,7 +78,8 @@ public class StudentProfile extends Fragment {
         studentNo.setText(model.getStudentPhone());
         guardianNo.setText(model.getGuardianPhone());
 
-        showQRDialog(model);
+        qrViewBtn.setOnClickListener(v -> showQRDialog(model));
+        attendSaveBtn.setOnClickListener(v -> Toast.makeText(getContext(), "Working this chapter", Toast.LENGTH_SHORT).show());
 
         subCodeBySem = new HashMap<>();
         int[] subCodeBySemester = {R.array.first_bsc_cse, R.array.second_bsc_cse, R.array.third_bsc_cse, R.array.fourth_bsc_cse,
@@ -81,17 +87,11 @@ public class StudentProfile extends Fragment {
                 R.array.tenth_bsc_cse, R.array.eleventh_bsc_cse, R.array.twelfth_bsc_cse};
 
         new FirebaseDatabaseHelper().getAllAttendanceInfoByStudentId(model.getId(), attendList -> {
-//            for (ClassAttendModel attendModel : attendList) {
-//                Log.e(new SimpleDateFormat("dd-MM-yyyy").format(Long.valueOf(attendModel.getDate())), attendModel.getPresent());
-//            }
             if (getActivity() != null) {
                 this.attendList = attendList;
                 classAttendGridView.setAdapter(new AttendAdapter(getContext(), attendList, subCodeBySem, subCodeBySemester));
             }
-
         });
-
-
 
         classAttendGridView.setOnItemClickListener((parent, view1, position, id) -> {
             Dialog dialog = new Dialog(getContext());
@@ -129,10 +129,6 @@ public class StudentProfile extends Fragment {
         List<ClassAttendModel> list = null;
         Map<String, Integer> subCodeBySem = null;
         int subCodeBySemesterLength = 0;
-//        Map<String, Integer> subCodeBySem = new HashMap<>();
-//        int[] subCodeBySemester = {R.array.first_bsc_cse, R.array.second_bsc_cse, R.array.third_bsc_cse, R.array.fourth_bsc_cse,
-//                R.array.fifth_bsc_cse, R.array.sixth_bsc_cse, R.array.seventh_bsc_cse, R.array.eighth_bsc_cse, R.array.ninth_bsc_cse,
-//                R.array.tenth_bsc_cse, R.array.eleventh_bsc_cse, R.array.twelfth_bsc_cse};
 
         public AttendAdapter(Context context, List<ClassAttendModel> list, Map<String, Integer> subCodeBySem, int[] subCodeBySemester) {
             this.context = context;
@@ -205,12 +201,7 @@ public class StudentProfile extends Fragment {
         final ImageView barcode = dialog.findViewById(R.id.imageView);
         Button save = dialog.findViewById(R.id.save);
 
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.cancel();
-            }
-        });
+        close.setOnClickListener(v -> dialog.cancel());
 
         MultiFormatWriter multiFormatWriter=new MultiFormatWriter();
         try{
@@ -219,14 +210,11 @@ public class StudentProfile extends Fragment {
             final Bitmap bitmap=barcodeEncoder.createBitmap(bitMatrix);
             barcode.setImageBitmap(bitmap);
 
-            save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, model.getRoll()+"_"+
-                            model.getBatch()+"_"+model.getDepartment(), null);
+            save.setOnClickListener(v -> {
+                MediaStore.Images.Media.insertImage(getContext().getContentResolver(), bitmap, model.getRoll()+"_"+
+                        model.getBatch()+"_"+model.getDepartment(), null);
 
-                    dialog.cancel();
-                }
+                dialog.cancel();
             });
 
         }

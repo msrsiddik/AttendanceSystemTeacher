@@ -50,6 +50,7 @@ public class Attendance_Register extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         studentList = view.findViewById(R.id.studentList);
+        getActivity().setTitle("Attendance Register");
 
         Bundle bundle = getArguments();
         classModel = Utils.getGsonParser().fromJson(bundle.getString("classModel"), ClassModel.class);

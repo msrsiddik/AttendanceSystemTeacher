@@ -46,6 +46,7 @@ public class NoticeBoard extends Fragment {
 
         userPref = new UserPref(getContext());
         fragmentInterface = (FragmentInterface) getActivity();
+        getActivity().setTitle("Notice Board");
 
         noticeSetBtn.setOnClickListener(v -> {
             fragmentInterface.gotoNoticeSet();

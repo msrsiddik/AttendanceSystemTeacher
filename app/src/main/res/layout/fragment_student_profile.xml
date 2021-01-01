@@ -92,15 +92,45 @@
             android:layout_weight="2"/>
     </LinearLayout>
 
-    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/classAttendGridView"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <Button
+            android:id="@+id/qrViewBtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="QR View"
+            android:layout_marginRight="5dp"/>
+        <Button
+            android:id="@+id/attendSaveBtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Attend Save Pdf"
+            android:layout_marginLeft="5dp"/>
+    </LinearLayout>
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:columnWidth="110dp"
-        android:numColumns="auto_fit"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="columnWidth"
-        android:gravity="center" />
+        android:fillViewport="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <GridView
+                android:id="@+id/classAttendGridView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnWidth="110dp"
+                android:numColumns="auto_fit"
+                android:verticalSpacing="10dp"
+                android:horizontalSpacing="10dp"
+                android:stretchMode="columnWidth"
+                android:gravity="center" />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

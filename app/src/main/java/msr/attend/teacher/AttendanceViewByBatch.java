@@ -41,6 +41,7 @@ public class AttendanceViewByBatch extends Fragment {
 
         Bundle bundle = getArguments();
         loadStudentFromDb(bundle.getString("batch"));
+        getActivity().setTitle("Batch : "+bundle.getString("batch"));
     }
 
     private void loadStudentFromDb(String batch) {

@@ -58,6 +58,7 @@ public class NotificationSend extends Fragment {
 
         userPref = new UserPref(getContext());
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+        getActivity().setTitle("Notice Sender");
 
         updateLabel(1);
         DatePickerDialog.OnDateSetListener date = (view1, year, monthOfYear, dayOfMonth) -> {

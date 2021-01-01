@@ -29,4 +29,13 @@ public class UserPref {
     public String getMyBatch(){
         return sharedPreferences.getString("batch","");
     }
+
+    public void setIsLogin(boolean login){
+        editor.putBoolean("isLogin",login);
+        editor.commit();
+    }
+
+    public boolean getIsLogin(){
+        return sharedPreferences.getBoolean("isLogin",false);
+    }
 }

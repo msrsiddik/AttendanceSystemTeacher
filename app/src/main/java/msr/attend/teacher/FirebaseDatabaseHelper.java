@@ -310,4 +310,55 @@ public class FirebaseDatabaseHelper {
             }
         });
     }
+
+    public interface ProfileDataShot{
+        void profileInfoListener(TeacherModel teacherModel);
+        void profileEditListener();
+    }
+
+    public void getProfileInfo(String id, final ProfileDataShot dataShot) {
+        teacherLogin.orderByChild("id").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    TeacherModel model = ds.getValue(TeacherModel.class);
+                    dataShot.profileInfoListener(model);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void editTeacher(TeacherModel teacher, final ProfileDataShot dataShort){
+        teacherLogin.child(teacher.getId()).setValue(teacher)
+                .addOnSuccessListener(aVoid -> dataShort.profileEditListener());
+    }
+
+    public interface ClassModelDataShot {
+        void classModelListener(List<ClassModel> models);
+    }
+
+    public void classModelByTeacherId(String id, final ClassModelDataShot classModelShot){
+        classInfoRef.orderByChild("teacherId").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ClassModel> classModels = new ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    ClassModel model = ds.getValue(ClassModel.class);
+                    classModels.add(model);
+                }
+                classModelShot.classModelListener(classModels);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 }

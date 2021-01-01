@@ -1,26 +1,47 @@
 package msr.attend.teacher;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import msr.attend.teacher.Model.ClassModel;
+import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.Model.Utils;
 import msr.attend.teacher.Service.DIUService;
 
-public class MainActivity extends AppCompatActivity implements FragmentInterface{
+public class MainActivity extends AppCompatActivity implements FragmentInterface, BottomNavigationView.OnNavigationItemSelectedListener{
     private FragmentManager fragmentManager;
+    private UserPref userPref;
+    private BottomNavigationView navigation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
 
+        userPref = new UserPref(this);
+
+        navigation = findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(this);
+
+        if (userPref.getIsLogin()){
+            gotoDashBoard();
+        } else {
+            login();
+            navigation.setVisibility(View.INVISIBLE);
+        }
+
         startService(new Intent(this, DIUService.class));
 
-        login();
     }
 
     @Override
@@ -30,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public void gotoDashBoard() {
+        navigation.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction().replace(R.id.fragContainer, new DashBoard()).commit();
     }
 
@@ -75,5 +97,36 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
         AttendanceViewByBatch viewByBatch = new AttendanceViewByBatch();
         viewByBatch.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.fragContainer, viewByBatch).addToBackStack(null).commit();
+    }
+
+    private boolean loadFragment(Fragment fragment) {
+        //switching fragment
+        if (fragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragContainer, fragment)
+                    .commit();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        Fragment fragment = null;
+        switch (item.getItemId()){
+            case R.id.dashboard:
+                fragment = new DashBoard();
+                break;
+
+            case R.id.profile:
+                fragment = new Profile();
+                break;
+
+            case R.id.notification:
+//                fragment = new UserNotification();
+                break;
+        }
+        return loadFragment(fragment);
     }
 }

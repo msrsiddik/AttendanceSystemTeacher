@@ -7,6 +7,8 @@
     <string name="delete">Delete</string>
     <string name="channel_name">Notice</string>
     <string name="channel_description">DIU Notice Alert</string>
+    <string name="profile_edit">Profile Edit</string>
+    <string name="logout">LogOut</string>
 
     <string-array name="department_name">
         <item>Select Department</item>

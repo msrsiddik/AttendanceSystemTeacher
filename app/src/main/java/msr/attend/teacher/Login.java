@@ -40,6 +40,8 @@ public class Login extends Fragment {
         loginBtn = view.findViewById(R.id.signInBtn);
         userPref = new UserPref(getContext());
 
+        getActivity().setTitle("Login Teacher Account");
+
         fragmentInterface = (FragmentInterface) getActivity();
 
         loginBtn.setOnClickListener(new View.OnClickListener() {

@@ -51,6 +51,7 @@ public class AddStudent extends Fragment {
         guardianPhone = view.findViewById(R.id.guardianPhone);
         stSubmitBtn = view.findViewById(R.id.studentSubmitBtn);
         back = view.findViewById(R.id.addStudentFormBack);
+        getActivity().setTitle("Add Student");
 
         userPref = new UserPref(getContext());
 
