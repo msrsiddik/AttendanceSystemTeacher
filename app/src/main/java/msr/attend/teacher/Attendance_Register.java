@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,10 +33,15 @@ import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.Utils;
 
 public class Attendance_Register extends Fragment {
+    private ToggleButton universityEntryMode;
     private ListView studentList;
     private ClassModel classModel;
     private long date = Calendar.getInstance().getTime().getTime();
     private DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
+    private List<StudentModel> studentModelList;
+    private List<ClassAttendModel> classAttendModels;
 
     public Attendance_Register() {
         // Required empty public constructor
@@ -49,26 +56,56 @@ public class Attendance_Register extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        universityEntryMode = view.findViewById(R.id.universityEntryMode);
         studentList = view.findViewById(R.id.studentList);
         getActivity().setTitle("Attendance Register");
 
         Bundle bundle = getArguments();
         classModel = Utils.getGsonParser().fromJson(bundle.getString("classModel"), ClassModel.class);
 
-        new FirebaseDatabaseHelper().getAttendDataByDate(dateFormat.format(date), classModel.getSubCode(), new FireMan.ClassAttendListener() {
-            @Override
-            public void classIsLoaded(List<ClassAttendModel> classAttendModels) {
-                new FirebaseDatabaseHelper().getMyBatchStudent(classModel.getBatch(),
-                        list -> {
-                    if (getActivity() != null) {
-                        studentList.setAdapter(new AttendRegisterAdapter(getContext(), list, classAttendModels));
-                    }
-                });
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        loadStudent();
+
+        universityEntryMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                universityEntryByLoadStudent();
+            } else {
+                loadStudent();
             }
         });
+    }
 
-//        new FirebaseDatabaseHelper().getMyBatchStudent(classModel.getBatch(),
-//                list -> studentList.setAdapter(new AttendRegisterAdapter(getContext(), list, attendModels)));
+    private void universityEntryByLoadStudent() {
+        firebaseDatabaseHelper.getUniEntryCurrentStatus(dateFormat.format(Calendar.getInstance().getTime()),
+                students -> {
+                    List<StudentModel> tempStudentModels = new ArrayList<>();
+                    for (StudentModel student : studentModelList) {
+                        for (String id : students) {
+                            if (student.getId().equals(id)) {
+                                tempStudentModels.add(student);
+                            }
+                        }
+                    }
+
+                    Log.e("get", "" + students);
+                    Log.e("Register", "" + tempStudentModels);
+                    if (getActivity() != null) {
+                        studentList.setAdapter(new AttendRegisterAdapter(getContext(), tempStudentModels, classAttendModels));
+                    }
+                });
+    }
+
+    private void loadStudent() {
+        firebaseDatabaseHelper.getAttendDataByDate(dateFormat.format(date), classModel.getSubCode(),
+                classAttendModels -> new FirebaseDatabaseHelper().getMyBatchStudent(classModel.getBatch(),
+                        list -> {
+                            this.studentModelList = list;
+                            this.classAttendModels = classAttendModels;
+                            if (getActivity() != null) {
+                                studentList.setAdapter(new AttendRegisterAdapter(getContext(), list, classAttendModels));
+                            }
+                        }));
     }
 
     class AttendRegisterAdapter extends ArrayAdapter<StudentModel> {
@@ -97,8 +134,8 @@ public class Attendance_Register extends Fragment {
             CheckBox attendCheck = view.findViewById(R.id.attendCheck);
 
             boolean check = false;
-            for (ClassAttendModel attendModel : classAttendModels){
-                if (attendModel.getStuId().equals(student.getId())){
+            for (ClassAttendModel attendModel : classAttendModels) {
+                if (attendModel.getStuId().equals(student.getId())) {
                     check = Boolean.parseBoolean(attendModel.getPresent());
                 }
             }

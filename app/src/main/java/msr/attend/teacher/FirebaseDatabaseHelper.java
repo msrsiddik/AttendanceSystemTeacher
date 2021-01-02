@@ -1,6 +1,7 @@
 package msr.attend.teacher;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,6 +42,7 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference studentRef;
     private DatabaseReference classAttendInfo;
     private DatabaseReference notification;
+    private DatabaseReference universityEntry;
 
     private APIService apiService;
 
@@ -53,8 +55,32 @@ public class FirebaseDatabaseHelper {
         studentRef = database.getReference().child("Students");
         classAttendInfo = database.getReference().child("ClassAttendInfo");
         notification = database.getReference().child("Notification");
+        universityEntry = database.getReference().child("AttendInfoInUniversity");
 
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+    }
+
+    public interface UniversityEntry{
+        void CurrentStatusListener(List<String> studentList);
+    }
+
+    public void getUniEntryCurrentStatus(String date, final UniversityEntry entry){
+        universityEntry.child("CurrentStatus").child(date).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> list = new ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    list.add(ds.getKey());
+                    Log.e("Data",ds.getKey());
+                }
+                entry.CurrentStatusListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void sendNoticeByBatch(String title, String body, String batch, Context context){
