@@ -1,15 +1,22 @@
 package msr.attend.teacher;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +27,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.List;
 
 import msr.attend.teacher.Model.NoticeModel;
+import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.UserPref;
 
 public class NoticeBoard extends Fragment {
@@ -27,6 +35,8 @@ public class NoticeBoard extends Fragment {
     private ListView noticeList;
     private FloatingActionButton noticeSetBtn;
     private FragmentInterface fragmentInterface;
+    private List<NoticeModel> noticeModelList;
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public NoticeBoard() {
         // Required empty public constructor
@@ -48,15 +58,61 @@ public class NoticeBoard extends Fragment {
         fragmentInterface = (FragmentInterface) getActivity();
         getActivity().setTitle("Notice Board");
 
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        getFragmentManager().popBackStack("NoticeSet", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
         noticeSetBtn.setOnClickListener(v -> {
             fragmentInterface.gotoNoticeSet();
         });
 
-        new FirebaseDatabaseHelper().getNotice(userPref.getTeacherId(), noticeModels -> {
+        firebaseDatabaseHelper.getNotice(userPref.getTeacherId(), noticeModels -> {
             if (getActivity() != null){
+                this.noticeModelList = noticeModels;
                 noticeList.setAdapter(new NoticeAdapter(getContext(), noticeModels));
             }
         });
+
+        noticeList.setOnItemClickListener((parent, view1, position, id) -> {
+            Dialog dialog = new Dialog(getContext());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.notice_view);
+
+            TextView title, body;
+            title = dialog.findViewById(R.id.title);
+            body = dialog.findViewById(R.id.body);
+
+            NoticeModel model = noticeModelList.get(position);
+            title.setText(model.getNoticeTitle());
+            body.setText(model.getNoticeBody());
+
+            dialog.show();
+        });
+
+        registerForContextMenu(noticeList);
+
+    }
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId()==R.id.noticeList){
+            menu.add(0,v.getId(),0,"Delete");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        CharSequence title = item.getTitle();
+        AdapterView.AdapterContextMenuInfo menuinfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        if ("Delete".equals(title)) {
+            firebaseDatabaseHelper.removeNotice(userPref.getTeacherId(),noticeModelList.get(menuinfo.position).getNoticeId());
+            Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     class NoticeAdapter extends ArrayAdapter<NoticeModel>{

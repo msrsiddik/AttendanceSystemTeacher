@@ -13,6 +13,11 @@
     <string-array name="department_name">
         <item>Select Department</item>
         <item>CSE</item>
+        <item>EEE</item>
+        <item>EETE</item>
+        <item>English</item>
+        <item>Law</item>
+        <item>Sociology</item>
     </string-array>
 
     <string-array name="first_bsc_cse">

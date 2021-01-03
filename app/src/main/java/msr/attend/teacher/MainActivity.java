@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public void gotoNoticeSet() {
-        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSend()).addToBackStack(null).commit();
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new NotificationSend()).addToBackStack("NoticeSet").commit();
     }
 
     @Override
@@ -123,9 +123,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
                 fragment = new Profile();
                 break;
 
-            case R.id.notification:
-//                fragment = new UserNotification();
-                break;
+//            case R.id.notification:
+////                fragment = new UserNotification();
+//                break;
         }
         return loadFragment(fragment);
     }

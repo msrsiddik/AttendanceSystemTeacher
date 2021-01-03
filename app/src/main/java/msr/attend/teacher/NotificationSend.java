@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +35,8 @@ public class NotificationSend extends Fragment {
     private EditText eNoticeTitle, eNoticeBody;
     private final Calendar myCalendar = Calendar.getInstance();
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
+    private FragmentInterface fragmentInterface;
+
 
     public NotificationSend() {
         // Required empty public constructor
@@ -59,6 +62,8 @@ public class NotificationSend extends Fragment {
         userPref = new UserPref(getContext());
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
         getActivity().setTitle("Notice Sender");
+
+        fragmentInterface = (FragmentInterface) getActivity();
 
         updateLabel(1);
         DatePickerDialog.OnDateSetListener date = (view1, year, monthOfYear, dayOfMonth) -> {
@@ -93,6 +98,7 @@ public class NotificationSend extends Fragment {
             firebaseDatabaseHelper.setNotice(new NoticeModel(userPref.getTeacherId(), batch,
                     title,body,datePicker.getText().toString()));
             firebaseDatabaseHelper.sendNoticeByBatch(title,body,batch,getContext());
+            fragmentInterface.gotoMyNotification();
         });
     }
 
