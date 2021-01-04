@@ -61,7 +61,7 @@ public class AddStudent extends Fragment {
 
         back.setOnClickListener(v -> {
             getFragmentManager().popBackStack("myBatch", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-            fragmentInterface.gotoMyBatch();
+//            fragmentInterface.gotoMyBatch();
         });
 
         spinnerAdapter = ArrayAdapter.createFromResource(getContext(), R.array.department_name, android.R.layout.simple_spinner_dropdown_item);

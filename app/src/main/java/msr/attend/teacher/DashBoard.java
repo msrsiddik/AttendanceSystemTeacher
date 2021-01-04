@@ -58,15 +58,15 @@ public class DashBoard extends Fragment {
                 getFragmentManager().popBackStack();
             }
         }
-
-        new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
-            userPref.setMyBatch(model.getBatch());
-        });
+//
+//        new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
+//            userPref.setMyBatch(model.getBatch());
+//        });
         fragmentInterface = (FragmentInterface) getActivity();
 
         myStudent.setOnClickListener(v -> getBatchAndGoToListStudent());
 
-        myBatch.setOnClickListener(v -> fragmentInterface.gotoMyBatch());
+        myBatch.setOnClickListener(v -> fragmentInterface.gotoMyBatchChooser());
 
         attendance.setOnClickListener(v -> fragmentInterface.gotoMyClassAttend());
 

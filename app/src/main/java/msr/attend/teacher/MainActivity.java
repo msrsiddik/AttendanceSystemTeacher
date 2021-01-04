@@ -56,8 +56,12 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     }
 
     @Override
-    public void gotoMyBatch() {
-        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatch()).addToBackStack("myBatch").commit();
+    public void gotoMyBatch(String selectBatch) {
+        Bundle bundle = new Bundle();
+        bundle.putString("batch", selectBatch);
+        MyBatch myBatch = new MyBatch();
+        myBatch.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, myBatch).addToBackStack("myBatch").commit();
     }
 
     @Override
@@ -97,6 +101,11 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
         AttendanceViewByBatch viewByBatch = new AttendanceViewByBatch();
         viewByBatch.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.fragContainer, viewByBatch).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoMyBatchChooser() {
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatchChooser()).addToBackStack(null).commit();
     }
 
     private boolean loadFragment(Fragment fragment) {

@@ -5,7 +5,7 @@ import msr.attend.teacher.Model.ClassModel;
 public interface FragmentInterface {
     void login();
     void gotoDashBoard();
-    void gotoMyBatch();
+    void gotoMyBatch(String selectBatch);
     void gotoMyClassAttend();
     void gotoAttendanceRegister(ClassModel classModel);
     void addStudentForm();
@@ -13,4 +13,5 @@ public interface FragmentInterface {
     void gotoMyNotification();
     void gotoNoticeSet();
     void gotoAttendViewByBatch(String batch);
+    void gotoMyBatchChooser();
 }

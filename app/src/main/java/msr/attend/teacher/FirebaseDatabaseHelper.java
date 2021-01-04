@@ -280,14 +280,18 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getCourseCoordinator(String id, FireMan.CoordinatorListener listener) {
-        coordinatorRef.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+    public void getCourseCoordinator(String id, final FireMan.CoordinatorListener listener){
+        coordinatorRef.child(id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<CoordinatorModel> coordinatorModels = new ArrayList<>();
                 if (snapshot.exists()) {
-                    CoordinatorModel model = snapshot.getValue(CoordinatorModel.class);
-                    listener.coordinatorIsLoad(model);
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        CoordinatorModel model = ds.getValue(CoordinatorModel.class);
+                        coordinatorModels.add(model);
+                    }
                 }
+                listener.coordinatorIsLoaded(coordinatorModels);
             }
 
             @Override

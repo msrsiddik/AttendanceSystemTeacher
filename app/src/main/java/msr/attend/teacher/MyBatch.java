@@ -1,6 +1,7 @@
 package msr.attend.teacher;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -51,8 +52,11 @@ public class MyBatch extends Fragment {
         userPref = new UserPref(getContext());
         addStudentBtn = view.findViewById(R.id.addStudentBtn);
 
-        loadStudentFromDb();
         getActivity().setTitle("My Batch");
+
+        Bundle bundle = getArguments();
+
+        loadStudentFromDb(bundle.getString("batch"));
 
         fragmentInterface = (FragmentInterface) getActivity();
         addStudentBtn.setOnClickListener(v -> fragmentInterface.addStudentForm());
@@ -60,14 +64,8 @@ public class MyBatch extends Fragment {
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        loadStudentFromDb();
-    }
-
-    private void loadStudentFromDb() {
-        new FirebaseDatabaseHelper().getMyBatchStudent(userPref.getMyBatch(), list -> {
+    private void loadStudentFromDb(String batch) {
+        new FirebaseDatabaseHelper().getMyBatchStudent(batch, list -> {
             if (getActivity()!=null) {
                 studentModelList = list;
                 studentListView.setAdapter(new MyStudentAdapter(getContext(), list));
@@ -112,29 +110,6 @@ public class MyBatch extends Fragment {
             editStudent.setArguments(bundle);
             getFragmentManager().beginTransaction().replace(R.id.fragContainer, editStudent).addToBackStack(null).commit();
 
-        } else if ("Delete".equals(title)) {
-            new FirebaseDatabaseHelper().deleteStudent(studentModelList.get(menuinfo.position).getId(),
-                    new FireMan.StudentDataShort() {
-                        @Override
-                        public void studentIsLoaded(List<StudentModel> students) {
-
-                        }
-
-                        @Override
-                        public void studentIsInserted() {
-
-                        }
-
-                        @Override
-                        public void studentIsDeleted() {
-                            Toast.makeText(getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void studentIsEdited() {
-
-                        }
-                    });
         } else {
             return false;
         }

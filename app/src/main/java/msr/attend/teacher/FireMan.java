@@ -13,7 +13,7 @@ public class FireMan {
     public interface MyBatchStudentLoad{ void studentIsLoaded(List<StudentModel> list); }
 
     public interface CoordinatorListener {
-        void coordinatorIsLoad(CoordinatorModel model);
+        void coordinatorIsLoaded(List<CoordinatorModel> models);
     }
 
     public interface ClassInfoListener {
