@@ -129,7 +129,7 @@ public class Attendance_Register extends Fragment {
             StudentModel student = list.get(position);
 
             TextView name = view.findViewById(R.id.studentName);
-            name.setText(student.getName());
+            name.setText(student.getRoll()+". "+student.getName());
 
             CheckBox attendCheck = view.findViewById(R.id.attendCheck);
 

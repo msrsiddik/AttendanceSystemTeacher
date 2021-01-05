@@ -62,6 +62,7 @@ public class MyBatchChooser extends Fragment {
                 chooserTitle.setVisibility(View.GONE);
                 batchSpinner.setVisibility(View.GONE);
                 chooserMessage.setVisibility(View.VISIBLE);
+                viewBtn.setVisibility(view.GONE);
                 chooserMessage.setText("You are not Coordinator");
             }
         });

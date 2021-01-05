@@ -122,13 +122,20 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int i = getFragmentManager().getBackStackEntryCount();
         Fragment fragment = null;
         switch (item.getItemId()){
             case R.id.dashboard:
+                while (i > 0) {
+                    getFragmentManager().popBackStack();
+                }
                 fragment = new DashBoard();
                 break;
 
             case R.id.profile:
+                while (i > 0) {
+                    getFragmentManager().popBackStack();
+                }
                 fragment = new Profile();
                 break;
 
