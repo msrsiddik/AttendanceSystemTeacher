@@ -7,6 +7,13 @@
     android:layout_margin="10dp"
     tools:context=".MyBatchChooser">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Coordinator Panel"
+        android:textSize="25sp"
+        android:textAlignment="center"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -14,15 +21,16 @@
         <TextView
             android:id="@+id/chooserTitle"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
             android:text="Choose Batch"
             android:paddingRight="50dp"
-            android:textSize="18sp"/>
+            android:textSize="18sp"
+            android:gravity="center_vertical"/>
 
         <Spinner
             android:id="@+id/batchSpinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="36dp"
             android:layout_toRightOf="@id/chooserTitle"/>
 
         <Button
@@ -41,5 +49,74 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:visibility="gone"/>
+
+    <LinearLayout
+        android:id="@+id/resultLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Attendance View"
+            android:textAlignment="center"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Select Batch"/>
+            <Spinner
+                android:id="@+id/spinBatch"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Select Semester"/>
+            <Spinner
+                android:id="@+id/spinSemester"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="Select Subject Code"/>
+            <Spinner
+                android:id="@+id/spinSubjectCode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/resultBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Result"/>
+    </LinearLayout>
 
 </LinearLayout>

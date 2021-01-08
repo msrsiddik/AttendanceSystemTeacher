@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import msr.attend.teacher.Model.ClassAttendModel;
+import msr.attend.teacher.Model.ClassPreferences;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.Model.Utils;
@@ -23,6 +25,11 @@ import msr.attend.teacher.Model.Utils;
 public class AttendanceViewByBatch extends Fragment {
     private ListView studentList;
     private List<StudentModel> studentModelList;
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
+    private String subCode;
+    private String batch;
+    private int highestClass = 0;
+    private ClassPreferences classPreferences;
 
     public AttendanceViewByBatch() {
         // Required empty public constructor
@@ -39,13 +46,19 @@ public class AttendanceViewByBatch extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         studentList = view.findViewById(R.id.studentList);
 
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        classPreferences = new ClassPreferences(getContext());
+
         Bundle bundle = getArguments();
+        this.batch = bundle.getString("batch");
         loadStudentFromDb(bundle.getString("batch"));
-        getActivity().setTitle("Batch : "+bundle.getString("batch"));
+        this.subCode = bundle.getString("subCode");
+        getActivity().setTitle("Batch : "+bundle.getString("batch")+" & Subject : "+subCode);
     }
 
     private void loadStudentFromDb(String batch) {
-        new FirebaseDatabaseHelper().getMyBatchStudent(batch, list -> {
+        firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
             if (getActivity()!=null) {
                 studentModelList = list;
                 studentList.setAdapter(new MyStudentAdapter(getContext(), list));
@@ -54,9 +67,11 @@ public class AttendanceViewByBatch extends Fragment {
                     StudentModel model = list.get(position);
                     String s = Utils.getGsonParser().toJson(model);
                     bundle.putString("student", s);
-                    StudentProfile profile = new StudentProfile();
-                    profile.setArguments(bundle);
-                    getFragmentManager().beginTransaction().replace(R.id.fragContainer, profile).addToBackStack(null).commit();
+                    bundle.putString("subCode", subCode);
+                    bundle.putString("batch", batch);
+                    MyStudent myStudent = new MyStudent();
+                    myStudent.setArguments(bundle);
+                    getFragmentManager().beginTransaction().replace(R.id.fragContainer, myStudent).addToBackStack(null).commit();
                 });
             }
         });
@@ -77,10 +92,21 @@ public class AttendanceViewByBatch extends Fragment {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             View view = inflater.inflate(R.layout.my_batch_student_row, parent,false);
 
+            StudentModel student = list.get(position);
+
             TextView name = view.findViewById(R.id.studentName);
-            name.setText(list.get(position).getName());
+            name.setText(student.getName());
             TextView roll = view.findViewById(R.id.studentRoll);
-            roll.setText(list.get(position).getRoll());
+            roll.setText(student.getRoll());
+            TextView attendCalc = view.findViewById(R.id.attendCalc);
+            firebaseDatabaseHelper.getAllAttendanceInfoByStudentIdAndSubjectCode(student.getId(), subCode, attendList -> {
+                if (highestClass < attendList.size()){
+                    highestClass = attendList.size();
+                }
+                classPreferences.setHighestClass(batch,highestClass);
+                attendCalc.setText("Total Attend Class : "+ attendList.size());
+            });
+
             return view;
         }
     }

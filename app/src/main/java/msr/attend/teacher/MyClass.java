@@ -45,23 +45,16 @@ public class MyClass extends Fragment {
         fragmentInterface = (FragmentInterface) getActivity();
         getActivity().setTitle("My Class");
 
-        new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
-            @Override
-            public void classInfoIsLoaded(List<ClassModel> list) {
-                if (getActivity() != null) {
-                    classModels = list;
-                    MyClassAdapter adapter = new MyClassAdapter(getContext(), list);
-                    myClassList.setAdapter(adapter);
-                }
+        new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), list -> {
+            if (getActivity() != null) {
+                classModels = list;
+                MyClassAdapter adapter = new MyClassAdapter(getContext(), list);
+                myClassList.setAdapter(adapter);
             }
         });
 
-        myClassList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                fragmentInterface.gotoAttendanceRegister(classModels.get(position));
-            }
-        });
+        myClassList.setOnItemClickListener((parent, view1, position, id) ->
+                fragmentInterface.gotoAttendanceRegister(classModels.get(position)));
     }
 
     class MyClassAdapter extends ArrayAdapter<ClassModel> {

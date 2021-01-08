@@ -139,7 +139,6 @@ public class Attendance_Register extends Fragment {
                     check = Boolean.parseBoolean(attendModel.getPresent());
                 }
             }
-
             attendCheck.setChecked(check);
 
             attendCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {

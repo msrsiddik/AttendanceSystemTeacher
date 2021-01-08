@@ -9,7 +9,7 @@ import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.StudentModel;
 
 public class FireMan {
-    public interface TeacherLogin{ void loginIsSuccess(String id); void loginIsFailed(); }
+    public interface TeacherLogin{ void loginIsSuccess(String id, String department); void loginIsFailed(); }
     public interface MyBatchStudentLoad{ void studentIsLoaded(List<StudentModel> list); }
 
     public interface CoordinatorListener {

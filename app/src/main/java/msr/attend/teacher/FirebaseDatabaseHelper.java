@@ -15,7 +15,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
@@ -58,6 +60,47 @@ public class FirebaseDatabaseHelper {
         universityEntry = database.getReference().child("AttendInfoInUniversity");
 
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
+    }
+
+    public void getAttendanceBySubjectWiseSelectBatch(String batch, String subjectCode){
+        List<String> dates = new ArrayList<>();
+        Map<String, Map<String, String>> studentAttendByDate = new HashMap<>();
+        classAttendInfo.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot date : snapshot.getChildren()){
+                    dates.add(date.getKey());
+                    Map<String, String> attend = new HashMap<>();
+                    for (DataSnapshot subject : date.getChildren()){
+                        for (DataSnapshot classAttend : subject.getChildren()) {
+                            ClassAttendModel attendModel = classAttend.getValue(ClassAttendModel.class);
+                            if (attendModel.getSubjectCode().equals(subjectCode)) {
+                                attend.put(attendModel.getStuId(), attendModel.getPresent());
+                            }
+                        }
+                    }
+                    studentAttendByDate.put(date.getKey(),attend);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        studentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     public interface UniversityEntry{
@@ -145,6 +188,33 @@ public class FirebaseDatabaseHelper {
         String key = notification.push().getKey().substring(0,10);
         notice.setNoticeId(key);
         notification.child("Notice").child(notice.getTeacherId()).child(key).setValue(notice);
+    }
+
+    public void getAllAttendanceInfoByStudentIdAndSubjectCode(String stuId, String subjectCode, final FireMan.AttendDataShort dataShort){
+        classAttendInfo.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ClassAttendModel> list = new ArrayList<>();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    //date path
+                    for (DataSnapshot a : d.getChildren()){
+                        //subject code path
+                        for (DataSnapshot b : a.getChildren()){
+                            ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
+                            if (attendModel.getStuId().equals(stuId) && attendModel.getSubjectCode().equals(subjectCode)){
+                                list.add(attendModel);
+                            }
+                        }
+                    }
+                }
+                dataShort.classAttendListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort){
@@ -327,7 +397,7 @@ public class FirebaseDatabaseHelper {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     TeacherModel teacher = ds.getValue(TeacherModel.class);
                     if (teacher.getPassword().equals(model.getPassword())) {
-                        login.loginIsSuccess(teacher.getId());
+                        login.loginIsSuccess(teacher.getId(), teacher.getDepartment());
                     } else {
                         login.loginIsFailed();
                     }

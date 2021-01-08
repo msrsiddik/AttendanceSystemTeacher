@@ -79,20 +79,27 @@ public class DashBoard extends Fragment {
         dialog.setContentView(R.layout.my_student_dialog);
 
         Spinner spinner = dialog.findViewById(R.id.myBatch);
+        Spinner spinner1 = dialog.findViewById(R.id.subCode);
         new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), list -> {
             Set<String> batch = new HashSet<>();
+            Set<String> subCode = new HashSet<>();
             for (ClassModel model : list){
                 batch.add(model.getBatch());
+                subCode.add(model.getSubCode());
             }
             ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
+
+            ArrayAdapter adapter1 = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, subCode.toArray());
+            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner1.setAdapter(adapter1);
         });
 
         Button button = dialog.findViewById(R.id.myStudentBtn);
         button.setOnClickListener(v -> {
+            fragmentInterface.gotoAttendViewByBatch(spinner.getSelectedItem().toString(), spinner1.getSelectedItem().toString());
             dialog.dismiss();
-            fragmentInterface.gotoAttendViewByBatch(spinner.getSelectedItem().toString());
         });
 
         dialog.show();

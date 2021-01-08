@@ -95,9 +95,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     }
 
     @Override
-    public void gotoAttendViewByBatch(String batch) {
+    public void gotoAttendViewByBatch(String batch, String subCode) {
         Bundle bundle = new Bundle();
         bundle.putString("batch", batch);
+        bundle.putString("subCode", subCode);
         AttendanceViewByBatch viewByBatch = new AttendanceViewByBatch();
         viewByBatch.setArguments(bundle);
         fragmentManager.beginTransaction().replace(R.id.fragContainer, viewByBatch).addToBackStack(null).commit();
@@ -122,20 +123,12 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int i = getFragmentManager().getBackStackEntryCount();
         Fragment fragment = null;
         switch (item.getItemId()){
             case R.id.dashboard:
-                while (i > 0) {
-                    getFragmentManager().popBackStack();
-                }
                 fragment = new DashBoard();
                 break;
-
             case R.id.profile:
-                while (i > 0) {
-                    getFragmentManager().popBackStack();
-                }
                 fragment = new Profile();
                 break;
 

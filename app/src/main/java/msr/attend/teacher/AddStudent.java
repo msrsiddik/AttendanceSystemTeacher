@@ -51,7 +51,7 @@ public class AddStudent extends Fragment {
         guardianPhone = view.findViewById(R.id.guardianPhone);
         stSubmitBtn = view.findViewById(R.id.studentSubmitBtn);
         back = view.findViewById(R.id.addStudentFormBack);
-        getActivity().setTitle("Add Student");
+        getActivity().setTitle("Edit Student");
 
         userPref = new UserPref(getContext());
 
@@ -61,7 +61,7 @@ public class AddStudent extends Fragment {
 
         back.setOnClickListener(v -> {
             getFragmentManager().popBackStack("myBatch", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//            fragmentInterface.gotoMyBatch();
+            fragmentInterface.gotoMyBatch(userPref.getMyBatch());
         });
 
         spinnerAdapter = ArrayAdapter.createFromResource(getContext(), R.array.department_name, android.R.layout.simple_spinner_dropdown_item);
@@ -183,6 +183,8 @@ public class AddStudent extends Fragment {
                         @Override
                         public void studentIsEdited() {
                             Toast.makeText(getContext(), "Updated", Toast.LENGTH_SHORT).show();
+                            getFragmentManager().popBackStack("myBatch", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                            fragmentInterface.gotoMyBatch(userPref.getMyBatch());
                         }
                     });
 

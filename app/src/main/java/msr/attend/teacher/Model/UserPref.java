@@ -38,4 +38,13 @@ public class UserPref {
     public boolean getIsLogin(){
         return sharedPreferences.getBoolean("isLogin",false);
     }
+
+    public void setDepartment(String department) {
+        editor.putString("department",department);
+        editor.commit();
+    }
+
+    public String getDepartment(){
+        return sharedPreferences.getString("department",null);
+    }
 }
