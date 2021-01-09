@@ -29,6 +29,7 @@ public class MyBatchChooser extends Fragment {
     private Button viewBtn, resultBtn;
     private UserPref userPref;
     private List<String> batch = new ArrayList<>();
+    private FragmentInterface fragmentInterface;
 
     private Spinner spinBatch, spinSemester, spinSubjectCode;
 
@@ -56,7 +57,7 @@ public class MyBatchChooser extends Fragment {
 
         userPref = new UserPref(getContext());
 
-        FragmentInterface fragmentInterface = (FragmentInterface) getActivity();
+        fragmentInterface = (FragmentInterface) getActivity();
 
         new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), models -> {
                 batch.clear();
@@ -79,8 +80,13 @@ public class MyBatchChooser extends Fragment {
         });
 
         viewBtn.setOnClickListener(v -> {
-            userPref.setMyBatch(batchSpinner.getSelectedItem().toString());
-            fragmentInterface.gotoMyBatch(batchSpinner.getSelectedItem().toString());
+            String selectBatch = batchSpinner.getSelectedItem().toString();
+            if (!selectBatch.equals("Select")) {
+                userPref.setMyBatch(selectBatch);
+                fragmentInterface.gotoMyBatch(selectBatch);
+            } else {
+                Toast.makeText(getContext(), "Please Select Batch", Toast.LENGTH_SHORT).show();
+            }
         });
 
         attendanceViewWorker();
@@ -89,7 +95,7 @@ public class MyBatchChooser extends Fragment {
             String selectBatch = spinBatch.getSelectedItem().toString();
             String selectSubject = spinSubjectCode.getSelectedItem().toString();
             if (!selectBatch.equals("Select") && !selectSubject.equals("Select")){
-                Toast.makeText(getContext(), "Work", Toast.LENGTH_SHORT).show();
+                fragmentInterface.gotoMyBatchAttendanceDateByDate(selectBatch, selectSubject);
             } else {
                 Toast.makeText(getContext(), "All Select Item Required", Toast.LENGTH_SHORT).show();
             }

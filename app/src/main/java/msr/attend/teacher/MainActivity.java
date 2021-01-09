@@ -6,9 +6,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -107,6 +109,16 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     @Override
     public void gotoMyBatchChooser() {
         fragmentManager.beginTransaction().replace(R.id.fragContainer, new MyBatchChooser()).addToBackStack(null).commit();
+    }
+
+    @Override
+    public void gotoMyBatchAttendanceDateByDate(String batch, String subCode) {
+        Bundle bundle = new Bundle();
+        bundle.putString("batch", batch);
+        bundle.putString("subCode", subCode);
+        MyBatchAttendaceDateByDate viewByBatchDateByDate = new MyBatchAttendaceDateByDate();
+        viewByBatchDateByDate.setArguments(bundle);
+        fragmentManager.beginTransaction().replace(R.id.fragContainer, viewByBatchDateByDate).addToBackStack(null).commit();
     }
 
     private boolean loadFragment(Fragment fragment) {

@@ -62,16 +62,16 @@ public class FirebaseDatabaseHelper {
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     }
 
-    public void getAttendanceBySubjectWiseSelectBatch(String batch, String subjectCode){
+    public void getAttendanceBySubjectWiseSelectBatch(String batch, String subjectCode) {
         List<String> dates = new ArrayList<>();
         Map<String, Map<String, String>> studentAttendByDate = new HashMap<>();
         classAttendInfo.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot date : snapshot.getChildren()){
+                for (DataSnapshot date : snapshot.getChildren()) {
                     dates.add(date.getKey());
                     Map<String, String> attend = new HashMap<>();
-                    for (DataSnapshot subject : date.getChildren()){
+                    for (DataSnapshot subject : date.getChildren()) {
                         for (DataSnapshot classAttend : subject.getChildren()) {
                             ClassAttendModel attendModel = classAttend.getValue(ClassAttendModel.class);
                             if (attendModel.getSubjectCode().equals(subjectCode)) {
@@ -79,7 +79,7 @@ public class FirebaseDatabaseHelper {
                             }
                         }
                     }
-                    studentAttendByDate.put(date.getKey(),attend);
+                    studentAttendByDate.put(date.getKey(), attend);
                 }
             }
 
@@ -103,18 +103,18 @@ public class FirebaseDatabaseHelper {
 
     }
 
-    public interface UniversityEntry{
+    public interface UniversityEntry {
         void CurrentStatusListener(List<String> studentList);
     }
 
-    public void getUniEntryCurrentStatus(String date, final UniversityEntry entry){
+    public void getUniEntryCurrentStatus(String date, final UniversityEntry entry) {
         universityEntry.child("CurrentStatus").child(date).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> list = new ArrayList<>();
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     list.add(ds.getKey());
-                    Log.e("Data",ds.getKey());
+                    Log.e("Data", ds.getKey());
                 }
                 entry.CurrentStatusListener(list);
             }
@@ -126,7 +126,7 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void sendNoticeByBatch(String title, String body, String batch, Context context){
+    public void sendNoticeByBatch(String title, String body, String batch, Context context) {
         notification.child("Tokens").child(batch).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -159,17 +159,17 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void removeNotice(String teacherId, String noticeId){
+    public void removeNotice(String teacherId, String noticeId) {
         notification.child("Notice").child(teacherId).child(noticeId).setValue(null);
     }
 
-    public void getNotice(String teacherId, final FireMan.NoticeDataShort dataShort){
+    public void getNotice(String teacherId, final FireMan.NoticeDataShort dataShort) {
         List<NoticeModel> noticeModels = new ArrayList<>();
         notification.child("Notice").child(teacherId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 noticeModels.clear();
-                for (DataSnapshot d : snapshot.getChildren()){
+                for (DataSnapshot d : snapshot.getChildren()) {
                     NoticeModel model = d.getValue(NoticeModel.class);
                     noticeModels.add(model);
                 }
@@ -184,24 +184,24 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void setNotice(NoticeModel notice){
-        String key = notification.push().getKey().substring(0,10);
+    public void setNotice(NoticeModel notice) {
+        String key = notification.push().getKey().substring(0, 10);
         notice.setNoticeId(key);
         notification.child("Notice").child(notice.getTeacherId()).child(key).setValue(notice);
     }
 
-    public void getAllAttendanceInfoByStudentIdAndSubjectCode(String stuId, String subjectCode, final FireMan.AttendDataShort dataShort){
+    public void getAllAttendanceInfoByBatchAndSubjectCode(String batch, String subjectCode, final FireMan.AttendDataShort dataShort) {
         classAttendInfo.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<ClassAttendModel> list = new ArrayList<>();
                 for (DataSnapshot d : snapshot.getChildren()) {
                     //date path
-                    for (DataSnapshot a : d.getChildren()){
+                    for (DataSnapshot a : d.getChildren()) {
                         //subject code path
-                        for (DataSnapshot b : a.getChildren()){
+                        for (DataSnapshot b : a.getChildren()) {
                             ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
-                            if (attendModel.getStuId().equals(stuId) && attendModel.getSubjectCode().equals(subjectCode)){
+                            if (attendModel.getBatch().equals(batch) && attendModel.getSubjectCode().equals(subjectCode)) {
                                 list.add(attendModel);
                             }
                         }
@@ -217,7 +217,34 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort){
+    public void getAllAttendanceInfoByStudentIdAndSubjectCode(String stuId, String subjectCode, final FireMan.AttendDataShort dataShort) {
+        classAttendInfo.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<ClassAttendModel> list = new ArrayList<>();
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    //date path
+                    for (DataSnapshot a : d.getChildren()) {
+                        //subject code path
+                        for (DataSnapshot b : a.getChildren()) {
+                            ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
+                            if (attendModel.getStuId().equals(stuId) && attendModel.getSubjectCode().equals(subjectCode)) {
+                                list.add(attendModel);
+                            }
+                        }
+                    }
+                }
+                dataShort.classAttendListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void getAllAttendanceInfoByStudentId(String stuId, final FireMan.AttendDataShort dataShort) {
         List<String> dates = new ArrayList<>();
 
 //        Map<String, List<ClassAttendModel>> map = new HashMap<>();
@@ -228,11 +255,11 @@ public class FirebaseDatabaseHelper {
                 List<ClassAttendModel> list = new ArrayList<>();
                 for (DataSnapshot d : snapshot.getChildren()) {
                     //date path
-                    for (DataSnapshot a : d.getChildren()){
+                    for (DataSnapshot a : d.getChildren()) {
                         //subject code path
-                        for (DataSnapshot b : a.getChildren()){
+                        for (DataSnapshot b : a.getChildren()) {
                             ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
-                            if (attendModel.getStuId().equals(stuId)){
+                            if (attendModel.getStuId().equals(stuId)) {
                                 list.add(attendModel);
                             }
                         }
@@ -350,7 +377,7 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getCourseCoordinator(String id, final FireMan.CoordinatorListener listener){
+    public void getCourseCoordinator(String id, final FireMan.CoordinatorListener listener) {
         coordinatorRef.child(id).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -411,8 +438,9 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public interface ProfileDataShot{
+    public interface ProfileDataShot {
         void profileInfoListener(TeacherModel teacherModel);
+
         void profileEditListener();
     }
 
@@ -420,7 +448,7 @@ public class FirebaseDatabaseHelper {
         teacherLogin.orderByChild("id").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     TeacherModel model = ds.getValue(TeacherModel.class);
                     dataShot.profileInfoListener(model);
                 }
@@ -433,7 +461,7 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void editTeacher(TeacherModel teacher, final ProfileDataShot dataShort){
+    public void editTeacher(TeacherModel teacher, final ProfileDataShot dataShort) {
         teacherLogin.child(teacher.getId()).setValue(teacher)
                 .addOnSuccessListener(aVoid -> dataShort.profileEditListener());
     }
@@ -442,12 +470,12 @@ public class FirebaseDatabaseHelper {
         void classModelListener(List<ClassModel> models);
     }
 
-    public void classModelByTeacherId(String id, final ClassModelDataShot classModelShot){
+    public void classModelByTeacherId(String id, final ClassModelDataShot classModelShot) {
         classInfoRef.orderByChild("teacherId").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<ClassModel> classModels = new ArrayList<>();
-                for (DataSnapshot ds : snapshot.getChildren()){
+                for (DataSnapshot ds : snapshot.getChildren()) {
                     ClassModel model = ds.getValue(ClassModel.class);
                     classModels.add(model);
                 }

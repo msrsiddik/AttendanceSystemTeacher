@@ -1,13 +1,14 @@
 package msr.attend.teacher;
 
 import android.content.Context;
-import android.os.Build;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Environment;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -16,12 +17,31 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
 import msr.attend.teacher.Model.StudentModel;
@@ -32,6 +52,7 @@ public class MyBatch extends Fragment {
     private UserPref userPref;
     private FloatingActionButton addStudentBtn;
     private FragmentInterface fragmentInterface;
+    private Button allQrSaveBtn;
     private ListView studentListView;
     private List<StudentModel> studentModelList = null;
 
@@ -48,6 +69,7 @@ public class MyBatch extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        allQrSaveBtn = view.findViewById(R.id.allQrSaveBtn);
         studentListView = view.findViewById(R.id.myBatchStudentList);
         userPref = new UserPref(getContext());
         addStudentBtn = view.findViewById(R.id.addStudentBtn);
@@ -55,19 +77,58 @@ public class MyBatch extends Fragment {
         getActivity().setTitle("My Batch");
 
         Bundle bundle = getArguments();
-
-        loadStudentFromDb(bundle.getString("batch"));
+        String batch = bundle.getString("batch");
+        loadStudentFromDb(batch);
 
         fragmentInterface = (FragmentInterface) getActivity();
         addStudentBtn.setOnClickListener(v -> fragmentInterface.addStudentForm());
         registerForContextMenu(studentListView);
+
+        allQrSaveBtn.setOnClickListener(v -> {
+
+            File pdfFolder = new File(Environment.getExternalStorageState(), "QRCode");
+            if (!pdfFolder.exists()) {
+                pdfFolder.mkdir();
+            }
+
+            Document document = new Document(PageSize.A4);
+            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+            try {
+                PdfWriter.getInstance(document, new FileOutputStream(pdfFolder+"/"+batch+".pdf"));
+                document.open();
+                PdfPTable pdfPTable = new PdfPTable(2);
+                for (StudentModel model : studentModelList){
+                    BitMatrix bitMatrix=multiFormatWriter.encode(model.getId(), BarcodeFormat.QR_CODE,200,200);
+                    BarcodeEncoder barcodeEncoder=new BarcodeEncoder();
+                    final Bitmap bitmap=barcodeEncoder.createBitmap(bitMatrix);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
+                    pdfPTable.addCell(Image.getInstance(stream.toByteArray()));
+                    pdfPTable.addCell(new Paragraph("Name : "+model.getName() +
+                            "\n Roll : "+model.getRoll()+"\n Batch : "+model.getBatch()+"\n Depart : "+model.getDepartment()));
+                }
+                document.add(pdfPTable);
+                document.close();
+                Toast.makeText(getContext(), "Save to Document Folder", Toast.LENGTH_SHORT).show();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (WriterException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
 
     }
 
     private void loadStudentFromDb(String batch) {
         new FirebaseDatabaseHelper().getMyBatchStudent(batch, list -> {
             if (getActivity()!=null) {
-                studentModelList = list;
+                this.studentModelList = list;
                 studentListView.setAdapter(new MyStudentAdapter(getContext(), list));
                 studentListView.setOnItemClickListener((parent, view, position, id) -> {
                     Bundle bundle = new Bundle();

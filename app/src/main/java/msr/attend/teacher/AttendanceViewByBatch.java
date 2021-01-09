@@ -7,10 +7,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -23,6 +26,8 @@ import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.Model.Utils;
 
 public class AttendanceViewByBatch extends Fragment {
+    private TextView totalClass;
+    private EditText customAttendMark;
     private ListView studentList;
     private List<StudentModel> studentModelList;
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
@@ -30,6 +35,7 @@ public class AttendanceViewByBatch extends Fragment {
     private String batch;
     private int highestClass = 0;
     private ClassPreferences classPreferences;
+    private int attendanceMark = 10;
 
     public AttendanceViewByBatch() {
         // Required empty public constructor
@@ -44,6 +50,8 @@ public class AttendanceViewByBatch extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        totalClass = view.findViewById(R.id.totalClass);
+        customAttendMark = view.findViewById(R.id.customAttendMark);
         studentList = view.findViewById(R.id.studentList);
 
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
@@ -55,6 +63,29 @@ public class AttendanceViewByBatch extends Fragment {
         loadStudentFromDb(bundle.getString("batch"));
         this.subCode = bundle.getString("subCode");
         getActivity().setTitle("Batch : "+bundle.getString("batch")+" & Subject : "+subCode);
+
+        customAttendMark.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0 && !s.toString().contains(".")) {
+                    attendanceMark = Integer.parseInt(s.toString());
+                    loadStudentFromDb(batch);
+                } else {
+                    attendanceMark = 10;
+                    loadStudentFromDb(batch);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void loadStudentFromDb(String batch) {
@@ -99,12 +130,22 @@ public class AttendanceViewByBatch extends Fragment {
             TextView roll = view.findViewById(R.id.studentRoll);
             roll.setText(student.getRoll());
             TextView attendCalc = view.findViewById(R.id.attendCalc);
+            TextView attendPercent = view.findViewById(R.id.attendPercent);
+            TextView attendMark = view.findViewById(R.id.attendMark);
+
             firebaseDatabaseHelper.getAllAttendanceInfoByStudentIdAndSubjectCode(student.getId(), subCode, attendList -> {
                 if (highestClass < attendList.size()){
                     highestClass = attendList.size();
                 }
+                totalClass.setText("Total Class : "+highestClass);
                 classPreferences.setHighestClass(batch,highestClass);
-                attendCalc.setText("Total Attend Class : "+ attendList.size());
+                int presentAttendClass = attendList.size();
+                attendCalc.setText(presentAttendClass+"");
+                if (highestClass > 0) {
+                    int percentAttendClass = (presentAttendClass * 100) / highestClass;
+                    attendPercent.setText(percentAttendClass + "%");
+                    attendMark.setText((percentAttendClass*attendanceMark)/100+"");
+                }
             });
 
             return view;

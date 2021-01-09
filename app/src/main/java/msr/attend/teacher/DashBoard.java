@@ -18,6 +18,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -79,26 +81,25 @@ public class DashBoard extends Fragment {
         dialog.setContentView(R.layout.my_student_dialog);
 
         Spinner spinner = dialog.findViewById(R.id.myBatch);
-        Spinner spinner1 = dialog.findViewById(R.id.subCode);
         new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), list -> {
-            Set<String> batch = new HashSet<>();
-            Set<String> subCode = new HashSet<>();
+            List<String> batchSubCode = new ArrayList<>();
+            Collections.sort(list, (o1, o2) -> o1.getBatch().compareTo(o2.getBatch()));
             for (ClassModel model : list){
-                batch.add(model.getBatch());
-                subCode.add(model.getSubCode());
+                batchSubCode.add(model.getBatch() +" -> "+model.getSubCode());
             }
-            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
+            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batchSubCode.toArray());
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
 
-            ArrayAdapter adapter1 = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, subCode.toArray());
-            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner1.setAdapter(adapter1);
+//            ArrayAdapter adapter1 = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, subCode.toArray());
+//            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            spinner1.setAdapter(adapter1);
         });
 
         Button button = dialog.findViewById(R.id.myStudentBtn);
         button.setOnClickListener(v -> {
-            fragmentInterface.gotoAttendViewByBatch(spinner.getSelectedItem().toString(), spinner1.getSelectedItem().toString());
+            String[] batchSubCode = spinner.getSelectedItem().toString().split(" -> ");
+            fragmentInterface.gotoAttendViewByBatch(batchSubCode[0], batchSubCode[1]);
             dialog.dismiss();
         });
 

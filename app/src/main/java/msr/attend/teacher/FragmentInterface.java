@@ -14,4 +14,6 @@ public interface FragmentInterface {
     void gotoNoticeSet();
     void gotoAttendViewByBatch(String batch, String subCode);
     void gotoMyBatchChooser();
+
+    void gotoMyBatchAttendanceDateByDate(String batch, String subCode);
 }

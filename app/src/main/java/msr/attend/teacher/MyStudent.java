@@ -69,7 +69,11 @@ public class MyStudent extends Fragment {
             }
 
             int totalClass = classPreferences.getHighestClass(batch);
-            attendanceCalculateView.setText("Present "+date.size()+ " class of "+totalClass +" | "+(date.size()*100)/totalClass+"% Attend");
+            if (totalClass > 0) {
+                attendanceCalculateView.setText("Present " + date.size() + " class of " + totalClass + " | " + (date.size() * 100) / totalClass + "% Attend");
+            } else {
+                attendanceCalculateView.setText("There have been no classes so far!");
+            }
 
             ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1,date.toArray());
             attendanceDate.setAdapter(adapter);
