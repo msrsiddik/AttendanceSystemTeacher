@@ -56,6 +56,7 @@ public class MyStudent extends Fragment {
         StudentModel model = Utils.getGsonParser().fromJson(bundle.getString("student"), StudentModel.class);
         String subCode = bundle.getString("subCode");
         String batch = bundle.getString("batch");
+        int tClass = bundle.getInt("totalClass");
         studentName.setText(model.getName());
         studentBatch.setText(model.getBatch());
         studentDepart.setText(model.getDepartment());
@@ -68,15 +69,24 @@ public class MyStudent extends Fragment {
                 date.add(new SimpleDateFormat("dd-MM-yyyy h:mm").format(new Date(Long.parseLong(c.getDate()))));
             }
 
-            int totalClass = classPreferences.getHighestClass(batch);
-            if (totalClass > 0) {
-                attendanceCalculateView.setText("Present " + date.size() + " class of " + totalClass + " | " + (date.size() * 100) / totalClass + "% Attend");
+//            int totalClass = classPreferences.getHighestClass(batch);
+//
+//            if (totalClass > 0) {
+//                attendanceCalculateView.setText("Present " + date.size() + " class of " + totalClass + " | " + (date.size() * 100) / totalClass + "% Attend");
+//            } else {
+//                attendanceCalculateView.setText("There have been no classes so far!");
+//            }
+
+            if (tClass > 0) {
+                attendanceCalculateView.setText("Present " + date.size() + " class of " + tClass + " | " + (date.size() * 100) / tClass + "% Attend");
             } else {
                 attendanceCalculateView.setText("There have been no classes so far!");
             }
 
-            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1,date.toArray());
-            attendanceDate.setAdapter(adapter);
+            if (getActivity() != null) {
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_list_item_1, date.toArray());
+                attendanceDate.setAdapter(adapter);
+            }
         });
     }
 }

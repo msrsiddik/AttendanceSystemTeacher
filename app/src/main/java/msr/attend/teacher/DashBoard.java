@@ -1,6 +1,7 @@
 package msr.attend.teacher;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -24,12 +25,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import msr.attend.teacher.Messenger.MessengerActivity;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.UserPref;
 
 public class DashBoard extends Fragment {
     private UserPref userPref;
-    private ImageButton myStudent, myBatch, attendance, notificationSet;
+    private ImageButton myStudent, myBatch, attendance, notificationSet, messengerBtn;
     private FragmentInterface fragmentInterface;
 
     public DashBoard() {
@@ -49,6 +51,7 @@ public class DashBoard extends Fragment {
         myBatch = view.findViewById(R.id.myBatch);
         attendance = view.findViewById(R.id.attendance);
         notificationSet = view.findViewById(R.id.notificationSet);
+        messengerBtn = view.findViewById(R.id.messengerBtn);
         userPref = new UserPref(getContext());
         userPref.setIsLogin(true);
 
@@ -73,6 +76,11 @@ public class DashBoard extends Fragment {
         attendance.setOnClickListener(v -> fragmentInterface.gotoMyClassAttend());
 
         notificationSet.setOnClickListener(v -> fragmentInterface.gotoMyNotification());
+
+        messengerBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), MessengerActivity.class);
+            getContext().startActivity(intent);
+        });
     }
 
     private void getBatchAndGoToListStudent() {
@@ -91,9 +99,6 @@ public class DashBoard extends Fragment {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
 
-//            ArrayAdapter adapter1 = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, subCode.toArray());
-//            adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            spinner1.setAdapter(adapter1);
         });
 
         Button button = dialog.findViewById(R.id.myStudentBtn);

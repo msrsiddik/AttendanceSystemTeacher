@@ -86,7 +86,7 @@ public class MyBatch extends Fragment {
 
         allQrSaveBtn.setOnClickListener(v -> {
 
-            File pdfFolder = new File(Environment.getExternalStorageState(), "QRCode");
+            File pdfFolder = new File(getContext().getExternalFilesDir(null), "QRCode");
             if (!pdfFolder.exists()) {
                 pdfFolder.mkdir();
             }

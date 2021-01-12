@@ -100,6 +100,7 @@ public class AttendanceViewByBatch extends Fragment {
                     bundle.putString("student", s);
                     bundle.putString("subCode", subCode);
                     bundle.putString("batch", batch);
+                    bundle.putInt("totalClass",highestClass);
                     MyStudent myStudent = new MyStudent();
                     myStudent.setArguments(bundle);
                     getFragmentManager().beginTransaction().replace(R.id.fragContainer, myStudent).addToBackStack(null).commit();

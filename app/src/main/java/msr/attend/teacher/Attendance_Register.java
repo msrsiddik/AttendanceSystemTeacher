@@ -40,7 +40,7 @@ public class Attendance_Register extends Fragment {
     private DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
-    private List<StudentModel> studentModelList;
+    private List<StudentModel> studentModelList = new ArrayList<>();
     private List<ClassAttendModel> classAttendModels;
 
     public Attendance_Register() {
@@ -65,7 +65,10 @@ public class Attendance_Register extends Fragment {
 
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
 
-        loadStudent();
+//        loadStudent();
+
+        universityEntryMode.setChecked(true);
+        universityEntryByLoadStudent();
 
         universityEntryMode.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
