@@ -146,10 +146,10 @@ public class Attendance_Register extends Fragment {
 
             attendCheck.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    ClassAttendModel attendModel = new ClassAttendModel(student.getId(), student.getBatch(), classModel.getSubCode(), String.valueOf(date), "true", classModel.getTeacherId());
+                    ClassAttendModel attendModel = new ClassAttendModel(student.getId(), student.getRoll(), student.getBatch(), classModel.getSubCode(), String.valueOf(date), "true", classModel.getTeacherId());
                     new FirebaseDatabaseHelper().insertClassAttend(attendModel, dateFormat.format(date), context);
                 } else {
-                    ClassAttendModel attendModel = new ClassAttendModel(student.getId(), student.getBatch(), classModel.getSubCode(), String.valueOf(date), "false", classModel.getTeacherId());
+                    ClassAttendModel attendModel = new ClassAttendModel(student.getId(), student.getRoll(), student.getBatch(), classModel.getSubCode(), String.valueOf(date), "false", classModel.getTeacherId());
                     new FirebaseDatabaseHelper().insertClassAttend(attendModel, dateFormat.format(date), context);
                 }
             });

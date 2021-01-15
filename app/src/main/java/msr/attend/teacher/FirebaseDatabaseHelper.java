@@ -228,7 +228,7 @@ public class FirebaseDatabaseHelper {
                         //subject code path
                         for (DataSnapshot b : a.getChildren()) {
                             ClassAttendModel attendModel = b.getValue(ClassAttendModel.class);
-                            if (attendModel.getStuId().equals(stuId) && attendModel.getSubjectCode().equals(subjectCode)) {
+                            if (attendModel.getStuId().equals(stuId) && attendModel.getSubjectCode().equals(subjectCode) && attendModel.getPresent().equals("true")) {
                                 list.add(attendModel);
                             }
                         }
@@ -337,6 +337,27 @@ public class FirebaseDatabaseHelper {
                     list.add(model);
                 }
                 dataShort.studentIsLoaded(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    interface StudentData{
+        void studentListener(StudentModel student);
+    }
+
+    public void getStudentById(String studentId, final StudentData dataShort) {
+        studentRef.orderByChild("id").equalTo(studentId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot d : snapshot.getChildren()) {
+                    StudentModel model = d.getValue(StudentModel.class);
+                    dataShort.studentListener(model);
+                }
             }
 
             @Override

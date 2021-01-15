@@ -326,7 +326,7 @@ public class Profile extends Fragment {
                 convertView = inflater.inflate(R.layout.ex_child_row,null);
             }
             TextView textView = convertView.findViewById(R.id.child);
-            textView.setText("   "+child.getSubCode()+" -> "+child.getTime());
+            textView.setText("   "+child.getSubCode()+" -> T: "+child.getTime() + " | B: "+child.getBatch());
             if (colorPos == 'c'){
                 textView.setBackgroundColor(Color.LTGRAY);
             } else {

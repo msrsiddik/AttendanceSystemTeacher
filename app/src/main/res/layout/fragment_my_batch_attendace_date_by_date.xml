@@ -6,9 +6,48 @@
     android:orientation="vertical"
     tools:context=".MyBatchAttendaceDateByDate">
 
+    <Button
+        android:id="@+id/saveAttendancePdf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Pdf" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="5">
+        <TextView
+            android:id="@+id/viewByDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="View By Date"/>
+        <Switch
+            android:id="@+id/sortSwitch"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center" />
+        <TextView
+            android:id="@+id/viewByName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="View By Name" />
+    </LinearLayout>
+
     <ExpandableListView
         android:id="@+id/expanListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <ExpandableListView
+        android:id="@+id/expanListView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
 </LinearLayout>

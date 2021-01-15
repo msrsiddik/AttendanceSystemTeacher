@@ -2,6 +2,7 @@ package msr.attend.teacher.Model;
 
 public class ClassAttendModel {
     private String stuId;
+    private String roll;
     private String batch;
     private String subjectCode;
     private String date;
@@ -11,8 +12,9 @@ public class ClassAttendModel {
     public ClassAttendModel() {
     }
 
-    public ClassAttendModel(String stuId, String batch, String subjectCode, String date, String present, String teacherId) {
+    public ClassAttendModel(String stuId, String roll, String batch, String subjectCode, String date, String present, String teacherId) {
         this.stuId = stuId;
+        this.roll = roll;
         this.batch = batch;
         this.subjectCode = subjectCode;
         this.date = date;
@@ -26,6 +28,14 @@ public class ClassAttendModel {
 
     public void setStuId(String stuId) {
         this.stuId = stuId;
+    }
+
+    public String getRoll() {
+        return roll;
+    }
+
+    public void setRoll(String roll) {
+        this.roll = roll;
     }
 
     public String getBatch() {

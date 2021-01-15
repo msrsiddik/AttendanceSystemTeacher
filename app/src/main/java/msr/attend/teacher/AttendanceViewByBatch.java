@@ -1,6 +1,7 @@
 package msr.attend.teacher;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -146,6 +147,15 @@ public class AttendanceViewByBatch extends Fragment {
                     int percentAttendClass = (presentAttendClass * 100) / highestClass;
                     attendPercent.setText(percentAttendClass + "%");
                     attendMark.setText((percentAttendClass*attendanceMark)/100+"");
+                    if (percentAttendClass >= 75){
+                        view.setBackgroundColor(Color.GREEN);
+                    }
+                    if (percentAttendClass >= 50 && percentAttendClass < 75){
+                        view.setBackgroundColor(Color.YELLOW);
+                    }
+                    if (percentAttendClass < 50){
+                        view.setBackgroundColor(Color.RED);
+                    }
                 }
             });
 
