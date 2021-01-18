@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,11 +17,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.ClassModel;
+import msr.attend.teacher.Model.ClassRepresentative;
 import msr.attend.teacher.Model.CoordinatorModel;
 import msr.attend.teacher.Model.NoticeModel;
 import msr.attend.teacher.Model.StudentModel;
@@ -45,6 +49,8 @@ public class FirebaseDatabaseHelper {
     private DatabaseReference classAttendInfo;
     private DatabaseReference notification;
     private DatabaseReference universityEntry;
+    private DatabaseReference crInfo;
+    private DatabaseReference superUserPermission;
 
     private APIService apiService;
 
@@ -58,9 +64,12 @@ public class FirebaseDatabaseHelper {
         classAttendInfo = database.getReference().child("ClassAttendInfo");
         notification = database.getReference().child("Notification");
         universityEntry = database.getReference().child("AttendInfoInUniversity");
+        crInfo = database.getReference().child("ClassRepresentative");
+        superUserPermission = database.getReference().child("SuperPermission");
 
         apiService = Client.getClient("https://fcm.googleapis.com/").create(APIService.class);
     }
+
 
     public void getAttendanceBySubjectWiseSelectBatch(String batch, String subjectCode) {
         List<String> dates = new ArrayList<>();
@@ -103,6 +112,104 @@ public class FirebaseDatabaseHelper {
 
     }
 
+    public interface RunningBatchShot {
+        void batchListener(Set<String> batchs);
+    }
+
+    public void getAllRunningBatch(String depart, final RunningBatchShot batchShot){
+        studentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Set<String> list = new HashSet<>();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    StudentModel model = ds.getValue(StudentModel.class);
+                    if (model.getDepartment().equals(depart)) {
+                        list.add(model.getBatch());
+                    }
+                }
+                batchShot.batchListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public interface SuperUserListener{
+        void superTeacher(boolean su);
+    }
+
+    public void getSuperSelectedTeacher(String id, final SuperUserListener superUserListener){
+        superUserPermission.child("SuperUser").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    if (child.getKey().equals(id)){
+                        superUserListener.superTeacher(true);
+                    } else {
+                        superUserListener.superTeacher(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public interface RoutineMode{
+        void routineModeListener(String mode);
+    }
+
+    public void routineGetMode(final RoutineMode routineMode){
+        superUserPermission.child("Routine").child("EveryoneSetup").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String mode = snapshot.getValue(String.class);
+                routineMode.routineModeListener(mode);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void getAllRunningBatch(final FireMan.RunningBatchShot batchShot){
+        studentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Set<String> list = new HashSet<>();
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    StudentModel model = ds.getValue(StudentModel.class);
+                    list.add(model.getBatch());
+                }
+                batchShot.batchListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void insertClassInfo(ClassModel classModel, final FireMan.ClassInfoListener listener){
+        String id = classInfoRef.push().getKey();
+        classModel.setClassId(id);
+        classInfoRef.child(id).setValue(classModel).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                listener.classInfoIsInserted();
+            }
+        });
+    }
+
     public interface UniversityEntry {
         void CurrentStatusListener(List<String> studentList);
     }
@@ -113,10 +220,52 @@ public class FirebaseDatabaseHelper {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> list = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    list.add(ds.getKey());
-                    Log.e("Data", ds.getKey());
+                    if (ds.getValue().toString().equals("in")) {
+                        list.add(ds.getKey());
+                        Log.e("Data", ds.getKey());
+                    }
                 }
                 entry.CurrentStatusListener(list);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    public void setNotificationToken(String token, String teacherId){
+        notification.child("TeachersToken").child(teacherId).setValue(token);
+    }
+
+    public void sendNotification(String studentId, String senderName, Context context){
+        notification.child("Tokens").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot batch : snapshot.getChildren()) {
+                    for (DataSnapshot token : batch.getChildren()) {
+                        if (token.getKey().equals(studentId)){
+                            Data data = new Data(senderName,"New Message");
+                            NotificationSender sender = new NotificationSender(data,token.getValue(String.class));
+                            apiService.sendNotifcation(sender).enqueue(new Callback<MyResponse>() {
+                                @Override
+                                public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                                    if (response.code() == 200){
+                                        if (response.body().success != 1){
+                                            Toast.makeText(context, "Does not use the Student app", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<MyResponse> call, Throwable t) {
+
+                                }
+                            });
+                        }
+                    }
+                }
             }
 
             @Override
@@ -445,7 +594,7 @@ public class FirebaseDatabaseHelper {
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     TeacherModel teacher = ds.getValue(TeacherModel.class);
                     if (teacher.getPassword().equals(model.getPassword())) {
-                        login.loginIsSuccess(teacher.getId(), teacher.getDepartment());
+                        login.loginIsSuccess(teacher.getId(), teacher.getDepartment(), teacher.getName());
                     } else {
                         login.loginIsFailed();
                     }

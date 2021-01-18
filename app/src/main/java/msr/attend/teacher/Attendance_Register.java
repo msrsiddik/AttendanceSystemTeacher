@@ -42,6 +42,7 @@ public class Attendance_Register extends Fragment {
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
     private List<StudentModel> studentModelList = new ArrayList<>();
     private List<ClassAttendModel> classAttendModels;
+    private List<ClassAttendModel> attendList;
 
     public Attendance_Register() {
         // Required empty public constructor
@@ -64,6 +65,10 @@ public class Attendance_Register extends Fragment {
         classModel = Utils.getGsonParser().fromJson(bundle.getString("classModel"), ClassModel.class);
 
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        firebaseDatabaseHelper.getAllAttendanceInfoByBatchAndSubjectCode(classModel.getBatch(), classModel.getSubCode(), attendList -> {
+            this.attendList = attendList;
+        });
 
 //        loadStudent();
 
@@ -134,6 +139,15 @@ public class Attendance_Register extends Fragment {
             TextView name = view.findViewById(R.id.studentName);
             name.setText(student.getRoll()+". "+student.getName());
 
+            TextView attendCounterV = view.findViewById(R.id.attendCounterV);
+            int classCount = 0;
+            for (ClassAttendModel attendModel : attendList) {
+                if (attendModel.getStuId().equals(student.getId()) && attendModel.getPresent().equals("true")){
+                    ++classCount;
+                }
+            }
+            attendCounterV.setText("Total Attend Class : "+classCount);
+
             CheckBox attendCheck = view.findViewById(R.id.attendCheck);
 
             boolean check = false;
@@ -156,5 +170,6 @@ public class Attendance_Register extends Fragment {
 
             return view;
         }
+
     }
 }

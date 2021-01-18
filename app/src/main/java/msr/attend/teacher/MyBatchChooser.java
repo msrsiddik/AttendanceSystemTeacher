@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import msr.attend.teacher.Model.CoordinatorModel;
 import msr.attend.teacher.Model.UserPref;
@@ -32,6 +33,8 @@ public class MyBatchChooser extends Fragment {
     private FragmentInterface fragmentInterface;
 
     private Spinner spinBatch, spinSemester, spinSubjectCode;
+
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public MyBatchChooser() {
         // Required empty public constructor
@@ -59,25 +62,48 @@ public class MyBatchChooser extends Fragment {
 
         fragmentInterface = (FragmentInterface) getActivity();
 
-        new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), models -> {
-                batch.clear();
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        Toast.makeText(getContext(), "" + userPref.isSuperUser(), Toast.LENGTH_SHORT).show();
+
+        firebaseDatabaseHelper.getCourseCoordinator(userPref.getTeacherId(), models -> {
+            batch.clear();
             if (models.size() > 0) {
                 batch.add("Select");
                 for (CoordinatorModel coordinateBatch : models) {
                     batch.add(coordinateBatch.getBatch());
                 }
-                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                batchSpinner.setAdapter(adapter);
-                spinBatch.setAdapter(adapter);
+                if (getActivity() != null) {
+
+                    ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    batchSpinner.setAdapter(adapter);
+                    if (!userPref.isSuperUser()) {
+                        spinBatch.setAdapter(adapter);
+                    }
+                }
             } else {
                 chooserTitle.setVisibility(View.GONE);
                 batchSpinner.setVisibility(View.GONE);
-                chooserMessage.setVisibility(View.VISIBLE);
                 viewBtn.setVisibility(view.GONE);
-                chooserMessage.setText("You are not Coordinator");
+                if (!userPref.isSuperUser()) {
+                    chooserMessage.setVisibility(View.VISIBLE);
+                    chooserMessage.setText("You are not Coordinator");
+                }
             }
         });
+
+        if (userPref.isSuperUser()) {
+            firebaseDatabaseHelper.getAllRunningBatch(userPref.getDepartment(), batchs -> {
+                List<String> list = new ArrayList<>();
+                for (String s : batchs) {
+                    list.add(s);
+                }
+                list.add(0,"Select");
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, list);
+                spinBatch.setAdapter(adapter);
+            });
+        }
 
         viewBtn.setOnClickListener(v -> {
             String selectBatch = batchSpinner.getSelectedItem().toString();
@@ -94,7 +120,7 @@ public class MyBatchChooser extends Fragment {
         resultBtn.setOnClickListener(v -> {
             String selectBatch = spinBatch.getSelectedItem().toString();
             String selectSubject = spinSubjectCode.getSelectedItem().toString();
-            if (!selectBatch.equals("Select") && !selectSubject.equals("Select")){
+            if (!selectBatch.equals("Select") && !selectSubject.equals("Select")) {
                 fragmentInterface.gotoMyBatchAttendanceDateByDate(selectBatch, selectSubject);
             } else {
                 Toast.makeText(getContext(), "All Select Item Required", Toast.LENGTH_SHORT).show();
@@ -103,7 +129,7 @@ public class MyBatchChooser extends Fragment {
 
     }
 
-    private void attendanceViewWorker(){
+    private void attendanceViewWorker() {
 
         ArrayAdapter<CharSequence> semesterAdapter = ArrayAdapter.createFromResource(getContext(), R.array.semester, android.R.layout.simple_spinner_item);
         semesterAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -150,7 +176,7 @@ public class MyBatchChooser extends Fragment {
                 subCodeAdapterLaw.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 subCodeAdapterSociology.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-                Log.e("position",position+"");
+                Log.e("position", position + "");
 
                 if (!userPref.getDepartment().equals(null)) {
                     switch (userPref.getDepartment()) {

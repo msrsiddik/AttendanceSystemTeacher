@@ -30,19 +30,19 @@
             android:id="@+id/attendCalc"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.75"
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/attendPercent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="1.25"
             android:textSize="20sp"/>
         <TextView
             android:id="@+id/attendMark"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="0.75"
             android:textSize="20sp"/>
 
 

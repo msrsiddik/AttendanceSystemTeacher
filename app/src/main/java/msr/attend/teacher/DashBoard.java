@@ -18,6 +18,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +35,7 @@ public class DashBoard extends Fragment {
     private UserPref userPref;
     private ImageButton myStudent, myBatch, attendance, notificationSet, messengerBtn;
     private FragmentInterface fragmentInterface;
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public DashBoard() {
         // Required empty public constructor
@@ -57,16 +60,15 @@ public class DashBoard extends Fragment {
 
         getActivity().setTitle("Dashboard");
 
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
         int back = getFragmentManager().getBackStackEntryCount();
         if (back > 0){
             for (int i = 0; i < back; i++) {
                 getFragmentManager().popBackStack();
             }
         }
-//
-//        new FirebaseDatabaseHelper().getCourseCoordinator(userPref.getTeacherId(), model -> {
-//            userPref.setMyBatch(model.getBatch());
-//        });
+
         fragmentInterface = (FragmentInterface) getActivity();
 
         myStudent.setOnClickListener(v -> getBatchAndGoToListStudent());
@@ -81,6 +83,17 @@ public class DashBoard extends Fragment {
             Intent intent = new Intent(getContext(), MessengerActivity.class);
             getContext().startActivity(intent);
         });
+
+        firebaseDatabaseHelper.getSuperSelectedTeacher(userPref.getTeacherId(), su -> {
+            userPref.setSuperUser(su);
+        });
+
+        updateToken();
+    }
+
+    private void updateToken() {
+        String refreshToken = FirebaseInstanceId.getInstance().getToken();
+        new FirebaseDatabaseHelper().setNotificationToken(refreshToken,userPref.getTeacherId());
     }
 
     private void getBatchAndGoToListStudent() {
@@ -89,16 +102,24 @@ public class DashBoard extends Fragment {
         dialog.setContentView(R.layout.my_student_dialog);
 
         Spinner spinner = dialog.findViewById(R.id.myBatch);
-        new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), list -> {
-            List<String> batchSubCode = new ArrayList<>();
-            Collections.sort(list, (o1, o2) -> o1.getBatch().compareTo(o2.getBatch()));
-            for (ClassModel model : list){
-                batchSubCode.add(model.getBatch() +" -> "+model.getSubCode());
-            }
-            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batchSubCode.toArray());
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinner.setAdapter(adapter);
 
+        firebaseDatabaseHelper.getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
+            @Override
+            public void classInfoIsLoaded(List<ClassModel> list) {
+                List<String> batchSubCode = new ArrayList<>();
+                Collections.sort(list, (o1, o2) -> o1.getBatch().compareTo(o2.getBatch()));
+                for (ClassModel model : list){
+                    batchSubCode.add(model.getBatch() +" -> "+model.getSubCode());
+                }
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batchSubCode.toArray());
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void classInfoIsInserted() {
+
+            }
         });
 
         Button button = dialog.findViewById(R.id.myStudentBtn);

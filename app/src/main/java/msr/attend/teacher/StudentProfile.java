@@ -13,6 +13,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -37,6 +40,7 @@ import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import msr.attend.teacher.Model.ClassAttendModel;
+import msr.attend.teacher.Model.ClassRepresentative;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.Utils;
 
@@ -46,6 +50,8 @@ public class StudentProfile extends Fragment {
     private GridView classAttendGridView;
     private List<ClassAttendModel> attendList;
     Map<String, Integer> subCodeBySem;
+    private ClassRepresentative classRepresentative;
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public StudentProfile() {
         // Required empty public constructor
@@ -70,6 +76,8 @@ public class StudentProfile extends Fragment {
         classAttendGridView = view.findViewById(R.id.classAttendGridView);
         getActivity().setTitle("Student Profile");
 
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
         Bundle bundle = getArguments();
         StudentModel model = Utils.getGsonParser().fromJson(bundle.getString("student"), StudentModel.class);
         studentName.setText(model.getName());
@@ -77,6 +85,8 @@ public class StudentProfile extends Fragment {
         studentDepart.setText(model.getDepartment());
         studentNo.setText(model.getStudentPhone());
         guardianNo.setText(model.getGuardianPhone());
+
+        classRepresentative = new ClassRepresentative(model.getId(),model.getBatch());
 
         qrViewBtn.setOnClickListener(v -> showQRDialog(model));
         attendSaveBtn.setOnClickListener(v -> Toast.makeText(getContext(), "Working this chapter", Toast.LENGTH_SHORT).show());

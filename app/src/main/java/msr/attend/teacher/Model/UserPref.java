@@ -47,4 +47,28 @@ public class UserPref {
     public String getDepartment(){
         return sharedPreferences.getString("department",null);
     }
+
+    public void setUserName(String name) {
+        editor.putString("userName",name);
+        editor.commit();
+    }
+
+    public String getUserName(){
+        return sharedPreferences.getString("userName",null);
+    }
+
+    public void setSuperUser(boolean b) {
+        editor.putBoolean("SU",b);
+        editor.commit();
+    }
+
+    public boolean isSuperUser(){
+        return sharedPreferences.getBoolean("SU", false);
+    }
+
+    public void clear(){
+        editor.clear();
+        editor.commit();
+    }
+
 }

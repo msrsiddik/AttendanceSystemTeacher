@@ -19,11 +19,13 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
+import msr.attend.teacher.MainActivity;
 import msr.attend.teacher.R;
 
 public class MyFireBaseMessagingService extends FirebaseMessagingService {
     private static final String CHANNEL_ID = "999";
     String title,message;
+    private int i = 0;
 
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
@@ -39,15 +41,30 @@ public class MyFireBaseMessagingService extends FirebaseMessagingService {
             }
         }
 
+        ++i;
         createNotificationChannel();
+
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        if (title.substring(title.length()-1).equals("#")){
+            intent.putExtra("message","open");
+        }
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        Uri defaultSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(getApplicationContext())
                         .setSmallIcon(R.drawable.ic_launcher_background)
                         .setContentTitle(title)
                         .setContentText(message)
+                        .setAutoCancel(true)
+                        .setSound(defaultSound)
+                        .setContentIntent(pendingIntent)
                         .setChannelId(CHANNEL_ID);
         NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(0, builder.build());
+        manager.notify(i, builder.build());
 
 
     }

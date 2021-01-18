@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import msr.attend.teacher.Messenger.MessengerActivity;
 import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.Model.Utils;
@@ -44,6 +45,20 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
 
         startService(new Intent(this, DIUService.class));
 
+        onNewIntent(getIntent());
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Bundle extras = intent.getExtras();
+        if(extras != null) {
+            if (extras.containsKey("message")){
+                Intent i = new Intent(this, MessengerActivity.class);
+                this.startActivity(i);
+            }
+        }
     }
 
     @Override

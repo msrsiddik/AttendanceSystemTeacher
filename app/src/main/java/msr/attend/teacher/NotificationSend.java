@@ -20,6 +20,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -81,14 +82,22 @@ public class NotificationSend extends Fragment {
             datePickerDialog.show();
         });
 
-        firebaseDatabaseHelper.getClassInfo(userPref.getTeacherId(), list -> {
-            Set<String> batch = new HashSet<>();
-            for (ClassModel model : list){
-                batch.add(model.getBatch());
+        firebaseDatabaseHelper.getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
+            @Override
+            public void classInfoIsLoaded(List<ClassModel> list) {
+                Set<String> batch = new HashSet<>();
+                for (ClassModel model : list){
+                    batch.add(model.getBatch());
+                }
+                ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                batchSpinner.setAdapter(adapter);
             }
-            ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batch.toArray());
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            batchSpinner.setAdapter(adapter);
+
+            @Override
+            public void classInfoIsInserted() {
+
+            }
         });
 
         sendBtn.setOnClickListener(v -> {

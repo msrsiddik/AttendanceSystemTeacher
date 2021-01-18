@@ -50,9 +50,10 @@ public class Login extends Fragment {
                 new FirebaseDatabaseHelper().login(new TeacherLoginModel(phone.getText().toString(), pass.getText().toString()),
                         new FireMan.TeacherLogin() {
                     @Override
-                    public void loginIsSuccess(String id, String department) {
+                    public void loginIsSuccess(String id, String department, String name) {
                         userPref.setTeacherId(id);
                         userPref.setDepartment(department);
+                        userPref.setUserName(name);
                         fragmentInterface.gotoDashBoard();
                     }
 

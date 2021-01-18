@@ -143,7 +143,7 @@ public class MyBatchAttendaceDateByDate extends Fragment {
                 }
 
                 firebaseDatabaseHelper.getMyBatchStudent(batch,list -> {
-                    expanListView2.setAdapter(new ExpanListAdapter2(getContext(), child2,new ArrayList<>(parent2),list));
+                    expanListView2.setAdapter(new ExpanListAdapter2(getContext(), child2, new ArrayList<>(parent2),list));
                 });
 
             }
@@ -390,12 +390,18 @@ public class MyBatchAttendaceDateByDate extends Fragment {
         HashMap<String, List<String>> child;
         List<String> parent;
         List<StudentModel> students;
+        int heightClass = 0;
 
         public ExpanListAdapter2(Context context, HashMap<String, List<String>> child, List<String> parent, List<StudentModel> students) {
             this.context = context;
             this.child = child;
             this.parent = parent;
             this.students = students;
+            for (Map.Entry<String, List<String>> entry : child.entrySet()) {
+                if (heightClass < entry.getValue().size()){
+                    heightClass = entry.getValue().size();
+                }
+            }
         }
 
         @Override
@@ -441,12 +447,20 @@ public class MyBatchAttendaceDateByDate extends Fragment {
                 convertView = inflater.inflate(R.layout.ex_header_row,null);
             }
             TextView txt = convertView.findViewById(R.id.header);
+            TextView classCountV = convertView.findViewById(R.id.classCountV);
             txt.setTypeface(null, Typeface.BOLD);
             for (StudentModel student : students) {
                 if (student.getId().equals(title)){
                     txt.setText(student.getName());
                 }
             }
+
+            for (Map.Entry<String, List<String>> hashMap : child.entrySet()){
+                if (hashMap.getKey().equals(title)){
+                    classCountV.setText(hashMap.getValue().size()+" of "+heightClass);
+                }
+            }
+
             return convertView;
         }
 

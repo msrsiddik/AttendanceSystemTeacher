@@ -34,7 +34,7 @@ public class AttendanceViewByBatch extends Fragment {
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
     private String subCode;
     private String batch;
-    private int highestClass = 0;
+    private int highestClass;
     private ClassPreferences classPreferences;
     private int attendanceMark = 10;
 
@@ -63,7 +63,7 @@ public class AttendanceViewByBatch extends Fragment {
         this.batch = bundle.getString("batch");
         loadStudentFromDb(bundle.getString("batch"));
         this.subCode = bundle.getString("subCode");
-        getActivity().setTitle("Batch : "+bundle.getString("batch")+" & Subject : "+subCode);
+        getActivity().setTitle("Batch : " + bundle.getString("batch") + " & Subject : " + subCode);
 
         customAttendMark.addTextChangedListener(new TextWatcher() {
             @Override
@@ -87,11 +87,18 @@ public class AttendanceViewByBatch extends Fragment {
 
             }
         });
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadStudentFromDb(batch);
     }
 
     private void loadStudentFromDb(String batch) {
         firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
-            if (getActivity()!=null) {
+            if (getActivity() != null) {
                 studentModelList = list;
                 studentList.setAdapter(new MyStudentAdapter(getContext(), list));
                 studentList.setOnItemClickListener((parent, view, position, id) -> {
@@ -101,7 +108,7 @@ public class AttendanceViewByBatch extends Fragment {
                     bundle.putString("student", s);
                     bundle.putString("subCode", subCode);
                     bundle.putString("batch", batch);
-                    bundle.putInt("totalClass",highestClass);
+                    bundle.putInt("totalClass", highestClass);
                     MyStudent myStudent = new MyStudent();
                     myStudent.setArguments(bundle);
                     getFragmentManager().beginTransaction().replace(R.id.fragContainer, myStudent).addToBackStack(null).commit();
@@ -113,6 +120,7 @@ public class AttendanceViewByBatch extends Fragment {
     class MyStudentAdapter extends ArrayAdapter<StudentModel> {
         Context context;
         List<StudentModel> list = null;
+
         public MyStudentAdapter(@NonNull Context context, @NonNull List<StudentModel> objects) {
             super(context, R.layout.my_batch_student_row, objects);
             this.context = context;
@@ -123,7 +131,7 @@ public class AttendanceViewByBatch extends Fragment {
         @Override
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            View view = inflater.inflate(R.layout.my_batch_student_row, parent,false);
+            View view = inflater.inflate(R.layout.my_batch_student_row, parent, false);
 
             StudentModel student = list.get(position);
 
@@ -136,24 +144,23 @@ public class AttendanceViewByBatch extends Fragment {
             TextView attendMark = view.findViewById(R.id.attendMark);
 
             firebaseDatabaseHelper.getAllAttendanceInfoByStudentIdAndSubjectCode(student.getId(), subCode, attendList -> {
-                if (highestClass < attendList.size()){
+                if (highestClass < attendList.size()) {
                     highestClass = attendList.size();
                 }
-                totalClass.setText("Total Class : "+highestClass);
-                classPreferences.setHighestClass(batch,highestClass);
+                totalClass.setText("Total Class : " + highestClass);
+                classPreferences.setHighestClass(batch, highestClass);
                 int presentAttendClass = attendList.size();
-                attendCalc.setText(presentAttendClass+"");
+                attendCalc.setText(presentAttendClass + "");
                 if (highestClass > 0) {
                     int percentAttendClass = (presentAttendClass * 100) / highestClass;
                     attendPercent.setText(percentAttendClass + "%");
-                    attendMark.setText((percentAttendClass*attendanceMark)/100+"");
-                    if (percentAttendClass >= 75){
+                    attendMark.setText((percentAttendClass * attendanceMark) / 100 + "");
+
+                    if (percentAttendClass >= 75) {
                         view.setBackgroundColor(Color.GREEN);
-                    }
-                    if (percentAttendClass >= 50 && percentAttendClass < 75){
+                    } else if (percentAttendClass >= 50 && percentAttendClass < 75) {
                         view.setBackgroundColor(Color.YELLOW);
-                    }
-                    if (percentAttendClass < 50){
+                    } else {
                         view.setBackgroundColor(Color.RED);
                     }
                 }

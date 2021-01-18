@@ -1,5 +1,6 @@
 package msr.attend.teacher.Messenger;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,29 +25,34 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import msr.attend.teacher.FirebaseDatabaseHelper;
 import msr.attend.teacher.Messenger.adapter.MessageAdapter;
 import msr.attend.teacher.Messenger.model.Chat;
 import msr.attend.teacher.Messenger.model.FireDatebase;
 import msr.attend.teacher.Model.UserPref;
+import msr.attend.teacher.Notification.APIService;
 import msr.attend.teacher.R;
 
 
 public class MessageActivity extends AppCompatActivity {
     private UserPref userPref;
-    TextView username;
-    ImageButton btn_send;
-    EditText text_send;
-    RecyclerView recyclerView;
+    private TextView username;
+    private ImageButton btn_send;
+    private EditText text_send;
+    private RecyclerView recyclerView;
 
-    Intent intent;
-    String userid;
+    private Intent intent;
+    private String userid;
 
-    MessageAdapter messageAdapter;
-    List<Chat> mchat;
+    private MessageAdapter messageAdapter;
+    private List<Chat> mchat;
 
-    ValueEventListener seenListener;
+    private ValueEventListener seenListener;
 
-    boolean notify = false;
+    private boolean notify = false;
+
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
+    private String userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,9 @@ public class MessageActivity extends AppCompatActivity {
         userid = intent.getStringExtra("userid");
 
         userPref = new UserPref(this);
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
+
+        this.userName = userPref.getUserName();
 
         recyclerView.setAdapter(messageAdapter);
 
@@ -74,7 +84,7 @@ public class MessageActivity extends AppCompatActivity {
             notify = true;
             String msg = text_send.getText().toString();
             if (!msg.equals("")){
-                sendMessage(userPref.getTeacherId(), userid, msg);
+                sendMessage(userPref.getTeacherId(), userid, msg, this);
             } else {
                 Toast.makeText(MessageActivity.this, "You can't send empty message", Toast.LENGTH_SHORT).show();
             }
@@ -108,7 +118,9 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMessage(String sender, final String receiver, String message){
+    private void sendMessage(String sender, final String receiver, String message, Context context){
+
+        String msgId = FireDatebase.getMessengerRef().push().getKey();
 
         HashMap<String, Object> hashMap = new HashMap<>();
         hashMap.put("sender", sender);
@@ -116,8 +128,10 @@ public class MessageActivity extends AppCompatActivity {
         hashMap.put("message", message);
         hashMap.put("dateLong", Calendar.getInstance().getTime().getTime());
         hashMap.put("isseen", false);
+        hashMap.put("msgId",msgId);
 
-        FireDatebase.getMessengerRef().child("Chats").push().setValue(hashMap);
+        FireDatebase.getMessengerRef().child("Chats").child(msgId).setValue(hashMap)
+                .addOnSuccessListener(aVoid -> firebaseDatabaseHelper.sendNotification(receiver,userName+"#", context));
 
         final DatabaseReference chatRef = FireDatebase.getMessengerRef().child("Chatlist")
                 .child(userPref.getTeacherId())

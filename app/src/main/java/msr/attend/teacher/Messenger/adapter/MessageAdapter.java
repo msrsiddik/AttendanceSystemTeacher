@@ -1,12 +1,15 @@
 package msr.attend.teacher.Messenger.adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.DateFormat;
@@ -15,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import msr.attend.teacher.Messenger.model.Chat;
+import msr.attend.teacher.Messenger.model.FireDatebase;
 import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.R;
 
@@ -62,6 +66,34 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         } else {
             holder.txt_seen.setVisibility(View.GONE);
         }
+
+        holder.show_message.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                builder.setIcon(R.drawable.messenger);
+                builder.setTitle(mChat.get(position).getMessage());
+                builder.setMessage("Do you want to delete this message");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (mChat.get(position).getSender().equals(new UserPref(mContext).getTeacherId())) {
+                            FireDatebase.getMessengerRef().child("Chats").child(mChat.get(position).getMsgId()).setValue(null);
+                            Toast.makeText(mContext, "Deleted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(mContext, "Delete only your MSG", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+                builder.show();
+
+                return false;
+            }
+        });
     }
 
     @Override

@@ -55,6 +55,7 @@ public class MyBatch extends Fragment {
     private Button allQrSaveBtn;
     private ListView studentListView;
     private List<StudentModel> studentModelList = null;
+    private FirebaseDatabaseHelper firebaseDatabaseHelper;
 
     public MyBatch() {
         // Required empty public constructor
@@ -75,6 +76,8 @@ public class MyBatch extends Fragment {
         addStudentBtn = view.findViewById(R.id.addStudentBtn);
 
         getActivity().setTitle("My Batch");
+
+        firebaseDatabaseHelper = new FirebaseDatabaseHelper();
 
         Bundle bundle = getArguments();
         String batch = bundle.getString("batch");
@@ -126,7 +129,7 @@ public class MyBatch extends Fragment {
     }
 
     private void loadStudentFromDb(String batch) {
-        new FirebaseDatabaseHelper().getMyBatchStudent(batch, list -> {
+        firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
             if (getActivity()!=null) {
                 this.studentModelList = list;
                 studentListView.setAdapter(new MyStudentAdapter(getContext(), list));
@@ -197,6 +200,7 @@ public class MyBatch extends Fragment {
             name.setText(list.get(position).getName());
             TextView roll = view.findViewById(R.id.studentRoll);
             roll.setText(list.get(position).getRoll());
+
             return view;
         }
     }

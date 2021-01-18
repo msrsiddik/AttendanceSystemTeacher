@@ -10,6 +10,12 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"/>
 
+    <TextView
+        android:id="@+id/attendCounterV"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/studentName"/>
+
     <CheckBox
         android:id="@+id/attendCheck"
         android:layout_alignEnd="@id/studentName"
