@@ -568,13 +568,16 @@ public class FirebaseDatabaseHelper {
         });
     }
 
-    public void getMyBatchStudent(String batch, FireMan.MyBatchStudentLoad load) {
+    public void getMyBatchStudent(String depart, String batch, FireMan.MyBatchStudentLoad load) {
         myBatchStudent.orderByChild("batch").equalTo(batch).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<StudentModel> list = new ArrayList<>();
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    list.add(ds.getValue(StudentModel.class));
+                    StudentModel model = ds.getValue(StudentModel.class);
+                    if (model.getDepartment().equals(depart)) {
+                        list.add(model);
+                    }
                 }
                 load.studentIsLoaded(list);
             }

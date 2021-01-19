@@ -34,6 +34,7 @@ public class AttendanceViewByBatch extends Fragment {
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
     private String subCode;
     private String batch;
+    private String depart;
     private int highestClass;
     private ClassPreferences classPreferences;
     private int attendanceMark = 10;
@@ -60,8 +61,9 @@ public class AttendanceViewByBatch extends Fragment {
         classPreferences = new ClassPreferences(getContext());
 
         Bundle bundle = getArguments();
+        this.depart = bundle.getString("depart");
         this.batch = bundle.getString("batch");
-        loadStudentFromDb(bundle.getString("batch"));
+        loadStudentFromDb(depart, bundle.getString("batch"));
         this.subCode = bundle.getString("subCode");
         getActivity().setTitle("Batch : " + bundle.getString("batch") + " & Subject : " + subCode);
 
@@ -75,10 +77,10 @@ public class AttendanceViewByBatch extends Fragment {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (s.length() != 0 && !s.toString().contains(".")) {
                     attendanceMark = Integer.parseInt(s.toString());
-                    loadStudentFromDb(batch);
+                    loadStudentFromDb(depart,batch);
                 } else {
                     attendanceMark = 10;
-                    loadStudentFromDb(batch);
+                    loadStudentFromDb(depart,batch);
                 }
             }
 
@@ -93,11 +95,11 @@ public class AttendanceViewByBatch extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        loadStudentFromDb(batch);
+        loadStudentFromDb(depart,batch);
     }
 
-    private void loadStudentFromDb(String batch) {
-        firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
+    private void loadStudentFromDb(String depart, String batch) {
+        firebaseDatabaseHelper.getMyBatchStudent(depart, batch, list -> {
             if (getActivity() != null) {
                 studentModelList = list;
                 studentList.setAdapter(new MyStudentAdapter(getContext(), list));

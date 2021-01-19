@@ -1,10 +1,12 @@
 package msr.attend.teacher;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -112,8 +114,9 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     }
 
     @Override
-    public void gotoAttendViewByBatch(String batch, String subCode) {
+    public void gotoAttendViewByBatch(String depart, String batch, String subCode) {
         Bundle bundle = new Bundle();
+        bundle.putString("depart",depart);
         bundle.putString("batch", batch);
         bundle.putString("subCode", subCode);
         AttendanceViewByBatch viewByBatch = new AttendanceViewByBatch();
@@ -139,9 +142,10 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
     private boolean loadFragment(Fragment fragment) {
         //switching fragment
         if (fragment != null) {
-            getSupportFragmentManager()
+            fragmentManager
                     .beginTransaction()
                     .replace(R.id.fragContainer, fragment)
+                    .addToBackStack(null)
                     .commit();
             return true;
         }
@@ -158,11 +162,35 @@ public class MainActivity extends AppCompatActivity implements FragmentInterface
             case R.id.profile:
                 fragment = new Profile();
                 break;
-
-//            case R.id.notification:
-////                fragment = new UserNotification();
-//                break;
         }
         return loadFragment(fragment);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (fragmentManager.getBackStackEntryCount()>0){
+            int fragments = fragmentManager.getBackStackEntryCount();
+            if (fragments == 1) {
+                fragmentManager.popBackStack();
+            } else if (fragmentManager.getBackStackEntryCount() > 1) {
+                fragmentManager.popBackStack();
+            }
+        }else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(R.mipmap.ic_launcher);
+            builder.setTitle("Teacher App");
+            builder.setMessage("Do you want to close this app?");
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    userPref.setSuperUser(false);
+                    MainActivity.super.onBackPressed();
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                }
+            });
+            builder.show();
+        }
     }
 }

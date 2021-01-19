@@ -81,7 +81,7 @@ public class MyBatch extends Fragment {
 
         Bundle bundle = getArguments();
         String batch = bundle.getString("batch");
-        loadStudentFromDb(batch);
+        loadStudentFromDb(userPref.getDepartment(), batch);
 
         fragmentInterface = (FragmentInterface) getActivity();
         addStudentBtn.setOnClickListener(v -> fragmentInterface.addStudentForm());
@@ -128,8 +128,8 @@ public class MyBatch extends Fragment {
 
     }
 
-    private void loadStudentFromDb(String batch) {
-        firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
+    private void loadStudentFromDb(String depart, String batch) {
+        firebaseDatabaseHelper.getMyBatchStudent(depart, batch, list -> {
             if (getActivity()!=null) {
                 this.studentModelList = list;
                 studentListView.setAdapter(new MyStudentAdapter(getContext(), list));

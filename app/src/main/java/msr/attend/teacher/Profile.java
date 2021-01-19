@@ -81,13 +81,6 @@ public class Profile extends Fragment {
 
         getActivity().setTitle("My Profile");
 
-        int back = getFragmentManager().getBackStackEntryCount();
-        if (back > 0){
-            for (int i = 0; i < back; i++) {
-                getFragmentManager().popBackStack();
-            }
-        }
-
         loadTeacherInfo();
 
         loadClassRoutine();

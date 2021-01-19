@@ -64,7 +64,7 @@
     </string-array>
 
     <string-array name="subCodeFirstItem">
-        <item>Select</item>
+        <item>Select Subject</item>
     </string-array>
 
     <!--    BSC in CSE     -->
@@ -443,84 +443,84 @@
 
     <!--    Hon's Low-->
     <string-array name="first_hons_llb">
-        <item>LL.BH-101</item>
-        <item>LL.BH-102</item>
-        <item>LL.BH-103</item>
-        <item>LL.BH-104</item>
-        <item>LL.BH-105</item>
+        <item>LL-BH-101</item>
+        <item>LL-BH-102</item>
+        <item>LL-BH-103</item>
+        <item>LL-BH-104</item>
+        <item>LL-BH-105</item>
     </string-array>
 
     <string-array name="second_hons_llb">
-        <item>LL.BH-201</item>
-        <item>LL.BH-202</item>
-        <item>LL.BH-203</item>
-        <item>LL.BH-204</item>
-        <item>LL.BH-205</item>
+        <item>LL-BH-201</item>
+        <item>LL-BH-202</item>
+        <item>LL-BH-203</item>
+        <item>LL-BH-204</item>
+        <item>LL-BH-205</item>
     </string-array>
 
     <string-array name="third_hons_llb">
-        <item>LL.BH-301</item>
-        <item>LL.BH-302</item>
-        <item>LL.BH-303</item>
+        <item>LL-BH-301</item>
+        <item>LL-BH-302</item>
+        <item>LL-BH-303</item>
     </string-array>
 
     <string-array name="fourth_hons_llb">
-        <item>LL.BH-401</item>
-        <item>LL.BH-402</item>
-        <item>LL.BH-403</item>
+        <item>LL-BH-401</item>
+        <item>LL-BH-402</item>
+        <item>LL-BH-403</item>
     </string-array>
 
     <string-array name="fifth_hons_llb">
-        <item>LL.BH-501</item>
-        <item>LL.BH-502</item>
-        <item>LL.BH-503</item>
-        <item>LL.BH-504</item>
+        <item>LL-BH-501</item>
+        <item>LL-BH-502</item>
+        <item>LL-BH-503</item>
+        <item>LL-BH-504</item>
     </string-array>
 
     <string-array name="sixth_hons_llb">
-        <item>LL.BH-601</item>
-        <item>LL.BH-602</item>
-        <item>LL.BH-603</item>
+        <item>LL-BH-601</item>
+        <item>LL-BH-602</item>
+        <item>LL-BH-603</item>
     </string-array>
 
     <string-array name="seventh_hons_llb">
-        <item>LL.BH-701</item>
-        <item>LL.BH-702</item>
-        <item>LL.BH-703</item>
-        <item>LL.BH-504</item>
+        <item>LL-BH-701</item>
+        <item>LL-BH-702</item>
+        <item>LL-BH-703</item>
+        <item>LL-BH-504</item>
     </string-array>
 
     <string-array name="eighth_hons_llb">
-        <item>LL.BH-801</item>
-        <item>LL.BH-802</item>
-        <item>LL.BH-803</item>
-        <item>LL.BH-804</item>
+        <item>LL-BH-801</item>
+        <item>LL-BH-802</item>
+        <item>LL-BH-803</item>
+        <item>LL-BH-804</item>
     </string-array>
 
     <string-array name="ninth_hons_llb">
-        <item>LL.BH-901</item>
-        <item>LL.BH-902</item>
-        <item>LL.BH-903</item>
+        <item>LL-BH-901</item>
+        <item>LL-BH-902</item>
+        <item>LL-BH-903</item>
     </string-array>
 
     <string-array name="tenth_hons_llb">
-        <item>LL.BH-1001</item>
-        <item>LL.BH-1002</item>
-        <item>LL.BH-1003</item>
-        <item>LL.BH-1004</item>
+        <item>LL-BH-1001</item>
+        <item>LL-BH-1002</item>
+        <item>LL-BH-1003</item>
+        <item>LL-BH-1004</item>
     </string-array>
 
     <string-array name="eleventh_hons_llb">
-        <item>LL.BH-1101</item>
-        <item>LL.BH-1102</item>
-        <item>LL.BH-1103</item>
+        <item>LL-BH-1101</item>
+        <item>LL-BH-1102</item>
+        <item>LL-BH-1103</item>
     </string-array>
 
     <string-array name="twelfth_hons_llb">
-        <item>LL.BH-1201</item>
-        <item>LL.BH-1202</item>
-        <item>LL.BH-1203</item>
-        <item>LL.BH-1204</item>
+        <item>LL-BH-1201</item>
+        <item>LL-BH-1202</item>
+        <item>LL-BH-1203</item>
+        <item>LL-BH-1204</item>
         <item>Viva voce</item>
     </string-array>
 

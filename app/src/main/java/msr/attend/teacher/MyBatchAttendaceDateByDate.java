@@ -52,6 +52,7 @@ import java.util.TreeSet;
 
 import msr.attend.teacher.Model.ClassAttendModel;
 import msr.attend.teacher.Model.StudentModel;
+import msr.attend.teacher.Model.UserPref;
 import msr.attend.teacher.Model.Utils;
 
 public class MyBatchAttendaceDateByDate extends Fragment {
@@ -62,6 +63,7 @@ public class MyBatchAttendaceDateByDate extends Fragment {
     private String batch;
     private String subCode;
     private FirebaseDatabaseHelper firebaseDatabaseHelper;
+    private UserPref userPref;
 
     public MyBatchAttendaceDateByDate() {
         // Required empty public constructor
@@ -82,6 +84,8 @@ public class MyBatchAttendaceDateByDate extends Fragment {
         viewByName = view.findViewById(R.id.viewByName);
         expanListView = view.findViewById(R.id.expanListView);
         expanListView2 = view.findViewById(R.id.expanListView2);
+
+        userPref = new UserPref(getContext());
 
         Bundle bundle = getArguments();
         batch = bundle.getString("batch");
@@ -121,7 +125,7 @@ public class MyBatchAttendaceDateByDate extends Fragment {
                     child.put(p,list);
                 }
 
-                firebaseDatabaseHelper.getMyBatchStudent(batch, list -> {
+                firebaseDatabaseHelper.getMyBatchStudent(userPref.getDepartment(), batch, list -> {
                     expanListView.setAdapter(new ExpanListAdapter(getContext(), child,parent,list));
                 });
 
@@ -142,7 +146,7 @@ public class MyBatchAttendaceDateByDate extends Fragment {
                     child2.put(id,list);
                 }
 
-                firebaseDatabaseHelper.getMyBatchStudent(batch,list -> {
+                firebaseDatabaseHelper.getMyBatchStudent(userPref.getDepartment(), batch,list -> {
                     expanListView2.setAdapter(new ExpanListAdapter2(getContext(), child2, new ArrayList<>(parent2),list));
                 });
 

@@ -106,7 +106,7 @@ public class Attendance_Register extends Fragment {
 
     private void loadStudent() {
         firebaseDatabaseHelper.getAttendDataByDate(dateFormat.format(date), classModel.getSubCode(),
-                classAttendModels -> new FirebaseDatabaseHelper().getMyBatchStudent(classModel.getBatch(),
+                classAttendModels -> new FirebaseDatabaseHelper().getMyBatchStudent(classModel.getDepart(),classModel.getBatch(),
                         list -> {
                             this.studentModelList = list;
                             this.classAttendModels = classAttendModels;

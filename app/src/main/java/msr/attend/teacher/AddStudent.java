@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.util.List;
 
 import msr.attend.teacher.Model.StudentModel;
@@ -23,7 +25,7 @@ import msr.attend.teacher.Model.UserPref;
 
 public class AddStudent extends Fragment {
     private UserPref userPref;
-    private EditText studentName, studentRoll, studentId, studentBatch, studentPhone, guardianPhone;
+    private TextInputEditText studentName, studentRoll, studentId, studentBatch, studentPhone, guardianPhone;
     private Spinner departSelect;
     private Button stSubmitBtn, back;
     private FragmentInterface fragmentInterface;

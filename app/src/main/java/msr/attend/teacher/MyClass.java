@@ -7,7 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,6 +19,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import msr.attend.teacher.Model.ClassModel;
@@ -45,6 +52,36 @@ public class MyClass extends Fragment {
         fragmentInterface = (FragmentInterface) getActivity();
         getActivity().setTitle("My Class");
 
+        todayClassList();
+
+        myClassList.setOnItemClickListener((parent, view1, position, id) ->
+                fragmentInterface.gotoAttendanceRegister(classModels.get(position)));
+
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.register_option_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.allClass:
+                allDayClassList();
+                break;
+            case R.id.todayClass:
+                todayClassList();
+                break;
+        }
+        return true;
+    }
+
+    private void allDayClassList(){
         new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
             @Override
             public void classInfoIsLoaded(List<ClassModel> list) {
@@ -60,9 +97,30 @@ public class MyClass extends Fragment {
 
             }
         });
+    }
 
-        myClassList.setOnItemClickListener((parent, view1, position, id) ->
-                fragmentInterface.gotoAttendanceRegister(classModels.get(position)));
+    private void todayClassList(){
+        new FirebaseDatabaseHelper().getClassInfo(userPref.getTeacherId(), new FireMan.ClassInfoListener() {
+            @Override
+            public void classInfoIsLoaded(List<ClassModel> list) {
+                if (getActivity() != null) {
+                    List<ClassModel> classList = new ArrayList<>();
+                    for (ClassModel model : list) {
+                        if (model.getDay().equals(new SimpleDateFormat("EEEE").format(Calendar.getInstance().getTime()))){
+                            classList.add(model);
+                        }
+                    }
+                    classModels = classList;
+                    MyClassAdapter adapter = new MyClassAdapter(getContext(), classList);
+                    myClassList.setAdapter(adapter);
+                }
+            }
+
+            @Override
+            public void classInfoIsInserted() {
+
+            }
+        });
     }
 
     class MyClassAdapter extends ArrayAdapter<ClassModel> {

@@ -109,7 +109,7 @@ public class DashBoard extends Fragment {
                 List<String> batchSubCode = new ArrayList<>();
                 Collections.sort(list, (o1, o2) -> o1.getBatch().compareTo(o2.getBatch()));
                 for (ClassModel model : list){
-                    batchSubCode.add(model.getBatch() +" -> "+model.getSubCode());
+                    batchSubCode.add(model.getDepart()+" -> "+model.getBatch() +" -> "+model.getSubCode());
                 }
                 ArrayAdapter adapter = new ArrayAdapter(getContext(), android.R.layout.simple_spinner_item, batchSubCode.toArray());
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -124,8 +124,8 @@ public class DashBoard extends Fragment {
 
         Button button = dialog.findViewById(R.id.myStudentBtn);
         button.setOnClickListener(v -> {
-            String[] batchSubCode = spinner.getSelectedItem().toString().split(" -> ");
-            fragmentInterface.gotoAttendViewByBatch(batchSubCode[0], batchSubCode[1]);
+            String[] depart_Batch_SubCode = spinner.getSelectedItem().toString().split(" -> ");
+            fragmentInterface.gotoAttendViewByBatch(depart_Batch_SubCode[0],depart_Batch_SubCode[1], depart_Batch_SubCode[2]);
             dialog.dismiss();
         });
 
