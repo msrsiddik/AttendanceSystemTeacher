@@ -12,15 +12,6 @@ public class TeacherModel {
     public TeacherModel() {
     }
 
-    public TeacherModel(String name, String phone, String email, String department, String gender, String password) {
-        this.name = name;
-        this.phone = phone;
-        this.email = email;
-        this.department = department;
-        this.gender = gender;
-        this.password = password;
-    }
-
     public TeacherModel(String id, String name, String phone, String email, String department, String gender, String password) {
         this.id = id;
         this.name = name;

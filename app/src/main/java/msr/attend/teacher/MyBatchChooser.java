@@ -64,8 +64,6 @@ public class MyBatchChooser extends Fragment {
 
         firebaseDatabaseHelper = new FirebaseDatabaseHelper();
 
-        Toast.makeText(getContext(), "" + userPref.isSuperUser(), Toast.LENGTH_SHORT).show();
-
         firebaseDatabaseHelper.getCourseCoordinator(userPref.getTeacherId(), models -> {
             batch.clear();
             if (models.size() > 0) {

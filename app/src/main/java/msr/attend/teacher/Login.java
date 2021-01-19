@@ -13,12 +13,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import msr.attend.teacher.Model.TeacherLoginModel;
 import msr.attend.teacher.Model.UserPref;
 
 public class Login extends Fragment {
     private UserPref userPref;
-    private EditText phone, pass;
+    private TextInputEditText phone, pass;
     private Button loginBtn;
     private FragmentInterface fragmentInterface;
 

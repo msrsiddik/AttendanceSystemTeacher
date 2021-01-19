@@ -32,6 +32,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -369,10 +371,10 @@ public class Profile extends Fragment {
         final Dialog dialog = new Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.fragment_edit_teacher);
-        EditText nameEdit = dialog.findViewById(R.id.teacherName);
-        EditText phoneEdit = dialog.findViewById(R.id.teacherPhoneNum);
-        EditText emailEdit = dialog.findViewById(R.id.teacherEmail);
-        EditText passEdit = dialog.findViewById(R.id.teacherPassword);
+        TextInputEditText nameEdit = dialog.findViewById(R.id.teacherName);
+        TextInputEditText phoneEdit = dialog.findViewById(R.id.teacherPhoneNum);
+        TextInputEditText emailEdit = dialog.findViewById(R.id.teacherEmail);
+        TextInputEditText passEdit = dialog.findViewById(R.id.teacherPassword);
         Spinner departmentSelect = dialog.findViewById(R.id.departmentSelect);
         RadioGroup radioGroup = dialog.findViewById(R.id.teacherGenderRdG);
         Button signUp = dialog.findViewById(R.id.teacherSubmit);
@@ -385,8 +387,9 @@ public class Profile extends Fragment {
         nameEdit.setText(teacherModel.getName());
         phoneEdit.setText(teacherModel.getPhone());
         emailEdit.setText(teacherModel.getEmail());
-        passEdit.setText(teacherModel.getPassword());
+
         departmentSelect.setSelection(adapter.getPosition(teacherModel.getDepartment()));
+
         if (teacherModel.getGender().equals("Male")) {
             radioGroup.check(R.id.maleRd);
         } else if (teacherModel.getGender().equals("Female")) {
@@ -399,8 +402,8 @@ public class Profile extends Fragment {
             String departName = departmentSelect.getSelectedItem().toString();
 
             TeacherModel editableTeacher = new TeacherModel(teacherModel.getId(), nameEdit.getText().toString(),
-                    phoneEdit.getText().toString(), emailEdit.getText().toString(), departName,
-                    genderRdBtn.getText().toString(), passEdit.getText().toString());
+                        phoneEdit.getText().toString(), emailEdit.getText().toString(), departName,
+                        genderRdBtn.getText().toString(), passEdit.getText().toString());
 
             firebaseDatabaseHelper.editTeacher(editableTeacher, new FirebaseDatabaseHelper.ProfileDataShot() {
                 @Override
