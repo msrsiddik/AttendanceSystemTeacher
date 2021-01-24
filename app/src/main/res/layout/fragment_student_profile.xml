@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
         android:weightSum="3">
         <TextView
             android:layout_width="0dp"
@@ -28,6 +29,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
+        android:weightSum="3">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Roll : "/>
+        <TextView
+            android:id="@+id/studentRoll"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
         android:weightSum="3">
         <TextView
             android:layout_width="0dp"
@@ -45,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
         android:weightSum="3">
         <TextView
             android:layout_width="0dp"
@@ -62,6 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
         android:weightSum="3">
         <TextView
             android:layout_width="0dp"
@@ -79,6 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
         android:weightSum="3">
         <TextView
             android:layout_width="0dp"
@@ -124,11 +147,10 @@
                 android:id="@+id/classAttendGridView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:columnWidth="110dp"
-                android:numColumns="auto_fit"
-                android:verticalSpacing="10dp"
+                android:layout_marginBottom="48dp"
+                android:numColumns="1"
                 android:horizontalSpacing="10dp"
-                android:stretchMode="columnWidth"
+                android:verticalSpacing="19dp"
                 android:gravity="center" />
         </LinearLayout>
     </ScrollView>

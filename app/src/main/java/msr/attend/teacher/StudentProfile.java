@@ -2,7 +2,9 @@ package msr.attend.teacher;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,33 +21,57 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.common.BitMatrix;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.GrayColor;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import msr.attend.teacher.Model.ClassAttendModel;
+import msr.attend.teacher.Model.ClassModel;
 import msr.attend.teacher.Model.ClassRepresentative;
 import msr.attend.teacher.Model.StudentModel;
 import msr.attend.teacher.Model.Utils;
 
 public class StudentProfile extends Fragment {
-    private TextView studentName, studentBatch, studentDepart, studentNo, guardianNo;
+    private TextView studentName, studentRoll, studentBatch, studentDepart, studentNo, guardianNo;
     private Button qrViewBtn, attendSaveBtn;
     private GridView classAttendGridView;
     private List<ClassAttendModel> attendList;
@@ -67,6 +93,7 @@ public class StudentProfile extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         studentName = view.findViewById(R.id.studentName);
+        studentRoll = view.findViewById(R.id.studentRoll);
         studentBatch = view.findViewById(R.id.studentBatch);
         studentDepart = view.findViewById(R.id.studentDepart);
         studentNo = view.findViewById(R.id.studentNo);
@@ -81,6 +108,7 @@ public class StudentProfile extends Fragment {
         Bundle bundle = getArguments();
         StudentModel model = Utils.getGsonParser().fromJson(bundle.getString("student"), StudentModel.class);
         studentName.setText(model.getName());
+        studentRoll.setText(model.getRoll());
         studentBatch.setText(model.getBatch());
         studentDepart.setText(model.getDepartment());
         studentNo.setText(model.getStudentPhone());
@@ -89,7 +117,13 @@ public class StudentProfile extends Fragment {
         classRepresentative = new ClassRepresentative(model.getId(),model.getBatch());
 
         qrViewBtn.setOnClickListener(v -> showQRDialog(model));
-        attendSaveBtn.setOnClickListener(v -> Toast.makeText(getContext(), "Working this chapter", Toast.LENGTH_SHORT).show());
+        attendSaveBtn.setOnClickListener(v -> {
+            Bundle stBundle = new Bundle();
+            stBundle.putString("student",bundle.getString("student"));
+            IndivitualPdfGenerate pdfGenerate = new IndivitualPdfGenerate();
+            pdfGenerate.setArguments(stBundle);
+            getFragmentManager().beginTransaction().replace(R.id.fragContainer, pdfGenerate).addToBackStack(null).commit();
+        });
 
         subCodeBySem = new HashMap<>();
         int[] subCodeBySemester = {R.array.first_bsc_cse, R.array.second_bsc_cse, R.array.third_bsc_cse, R.array.fourth_bsc_cse,
@@ -130,6 +164,20 @@ public class StudentProfile extends Fragment {
             }
 
             dialog.show();
+        });
+
+        studentNo.setOnLongClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:"+model.getStudentPhone()));
+            startActivity(intent);
+            return false;
+        });
+
+        guardianNo.setOnLongClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            intent.setData(Uri.parse("tel:"+model.getGuardianPhone()));
+            startActivity(intent);
+            return false;
         });
 
     }
@@ -234,5 +282,6 @@ public class StudentProfile extends Fragment {
 
         dialog.show();
     }
+
 
 }

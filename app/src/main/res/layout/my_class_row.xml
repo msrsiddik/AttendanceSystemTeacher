@@ -3,8 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:padding="5dp"
-    android:weightSum="2">
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="10dp"
+    android:paddingTop="10dp"
+    android:weightSum="3">
 
     <TextView
         android:id="@+id/courseCode"
@@ -14,6 +17,13 @@
 
     <TextView
         android:id="@+id/batch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/depart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

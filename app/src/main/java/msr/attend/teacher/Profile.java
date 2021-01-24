@@ -387,6 +387,7 @@ public class Profile extends Fragment {
         nameEdit.setText(teacherModel.getName());
         phoneEdit.setText(teacherModel.getPhone());
         emailEdit.setText(teacherModel.getEmail());
+        passEdit.setText(teacherModel.getPassword());
 
         departmentSelect.setSelection(adapter.getPosition(teacherModel.getDepartment()));
 

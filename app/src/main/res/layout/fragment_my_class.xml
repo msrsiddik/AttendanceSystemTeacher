@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="2"
+        android:weightSum="3"
         android:paddingBottom="5dp">
         <TextView
             android:layout_width="0dp"
@@ -24,11 +24,18 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Batch"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Depart"/>
     </LinearLayout>
 
     <ListView
         android:id="@+id/myCLassList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:dividerHeight="10dp"/>
 
 </LinearLayout>

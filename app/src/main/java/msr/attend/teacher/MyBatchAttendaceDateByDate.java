@@ -95,17 +95,21 @@ public class MyBatchAttendaceDateByDate extends Fragment {
 
         firebaseDatabaseHelper.getAllAttendanceInfoByBatchAndSubjectCode(batch,subCode,attendList -> {
 
-            if (getActivity() != null){
-
-                saveAttendancePdf.setOnClickListener(v -> {
-                    try {
+            saveAttendancePdf.setOnClickListener(v -> {
+                try {
+                    if (attendList.size() > 0) {
                         generatePdf(attendList);
-                    } catch (DocumentException e) {
-                        e.printStackTrace();
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
+                    } else {
+                        Toast.makeText(getContext(), "Class Not Found, Save PDF failed!", Toast.LENGTH_SHORT).show();
                     }
-                });
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            if (getActivity() != null){
 
                 DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
                 List<String> date = new ArrayList<>();
@@ -210,7 +214,7 @@ public class MyBatchAttendaceDateByDate extends Fragment {
         }
 
         Document document = new Document(PageSize.A4.rotate(),0,0,40,0);
-        PdfWriter.getInstance(document, new FileOutputStream(pdfFolder+"/"+batch+"_attendance.pdf"));
+        PdfWriter.getInstance(document, new FileOutputStream(pdfFolder+"/"+this.batch+"-"+this.subCode+"_attendance.pdf"));
         document.open();
 
         Paragraph universityName = new Paragraph(new Phrase(10,"Dhaka International University",
@@ -246,9 +250,9 @@ public class MyBatchAttendaceDateByDate extends Fragment {
         courseTitle.setFont(new Font(Font.FontFamily.COURIER,18,Font.BOLD));
         infoTable.addCell(batch);
 
-        infoTable.addCell("Introduction to Computer Systems");
-        infoTable.addCell("CSE-101");
-        infoTable.addCell("42");
+        infoTable.addCell("Subject Name Null");
+        infoTable.addCell(this.subCode);
+        infoTable.addCell(this.batch);
 
         document.add(infoTable);
 
@@ -258,34 +262,50 @@ public class MyBatchAttendaceDateByDate extends Fragment {
         PdfPCell headerTable = new PdfPCell(new Phrase("Attendance Report",f));
         headerTable.setBackgroundColor(GrayColor.LIGHT_GRAY);
         headerTable.setHorizontalAlignment(Element.ALIGN_CENTER);
-        headerTable.setColspan(dates.size()+1);
+        headerTable.setColspan(dates.size()+4);
 
-        PdfPTable pdfPTable = new PdfPTable(dates.size()+1);
+        PdfPTable pdfPTable = new PdfPTable(dates.size()+4);
         pdfPTable.setWidthPercentage(97);
         pdfPTable.addCell(headerTable);
         pdfPTable.addCell("Date\nRoll");
         for (String d : dates) {
-            pdfPTable.addCell(new SimpleDateFormat("dd.MM.yy").format(new Date(Long.parseLong(d))));
+            PdfPCell cell = new PdfPCell(new Phrase(new SimpleDateFormat("dd.MM.yy").format(new Date(Long.parseLong(d)))));
+            cell.setRotation(90);
+            pdfPTable.addCell(cell);
         }
 
-
+        PdfPCell present = new PdfPCell(new Phrase("Present"));
+        present.setRotation(90);
+        pdfPTable.addCell(present);
+        PdfPCell absent = new PdfPCell(new Phrase("Absent"));
+        absent.setRotation(90);
+        pdfPTable.addCell(absent);
+        PdfPCell total = new PdfPCell(new Phrase("Percent"));
+        total.setRotation(90);
+        pdfPTable.addCell(total);
 
         for (String roll : studentRoll){
             pdfPTable.addCell(roll);
-
+            final int[] _p = {0};
+            int _a = 0;
             for (int i = 0 ; i < dates.size(); i++){
                 int finalI = i;
                 final boolean[] print = {false};
                 for (ClassAttendModel classAttendModel : attendList) {
                     if (classAttendModel.getDate().equals(dates.get(finalI)) && classAttendModel.getRoll().equals(roll) && classAttendModel.getPresent().equals("true")) {
                         pdfPTable.addCell("P");
+                        ++_p[0];
                         print[0] = true;
                     }
                 }
                 if (!print[0]){
                     pdfPTable.addCell("A");
+                    ++_a;
                 }
             }
+            pdfPTable.addCell(_p[0]+"");
+            pdfPTable.addCell(_a+"");
+            pdfPTable.addCell((_p[0]*100)/(_p[0]+_a)+"%");
         }
 
         document.add(pdfPTable);

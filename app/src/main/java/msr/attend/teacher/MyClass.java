@@ -144,6 +144,9 @@ public class MyClass extends Fragment {
             TextView batch = view.findViewById(R.id.batch);
             batch.setText(list.get(position).getBatch());
 
+            TextView depart = view.findViewById(R.id.depart);
+            depart.setText(list.get(position).getDepart());
+
             return view;
         }
 
